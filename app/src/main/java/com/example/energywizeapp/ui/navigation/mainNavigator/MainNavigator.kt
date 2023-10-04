@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.energywizeapp.ProfileDetails
 
 @Composable
 fun MainNavigator(
@@ -135,7 +136,8 @@ fun MainNavigator(
         }
     ) {innerPadding ->
         NavHost(navController = navController, startDestination = "home", Modifier.padding(innerPadding)) {
-            composable("profile") { /*TODO: call the proper view composable */ }
+            composable("profile") { ProfileDetails() }
+            // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
             composable("home") { /*TODO: call the proper view composable */ }
             composable("settings") { /*TODO: call the proper view composable */ }
         }
