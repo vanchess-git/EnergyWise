@@ -1,7 +1,6 @@
 package com.example.energywizeapp
 
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -30,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.energywizeapp.ui.navigation.mainNavigator.MainNavigator
 import com.example.energywizeapp.ui.theme.EnergyWizeAppTheme
@@ -42,8 +38,7 @@ class MainActivity : ComponentActivity() {
             EnergyWizeAppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     MainNavigator()
                 }
@@ -77,65 +72,51 @@ fun ProfileDetails() {
             ) {
                 Text(text = "Hei, Jorma Sähköinen!", fontWeight = FontWeight.Bold)
             }
-            Row(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(color = Color.LightGray)
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+        }
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(color = Color.LightGray)
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(
-                    modifier = Modifier.padding(8.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                Row(
+                    modifier = Modifier, horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Row(
-                        modifier = Modifier,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(imageVector = Icons.Default.Home, contentDescription = "Home")
-                        Spacer(modifier = Modifier.padding(6.dp))
-                        Text(text = "Valkyriankatu 12 C 36")
-                    }
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Row(
-                        modifier = Modifier,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
-                        Spacer(modifier = Modifier.padding(6.dp))
-                        Text(text = "Sopimukset")
-                    }
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Row(
-                        modifier = Modifier,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(imageVector = Icons.Default.Email, contentDescription = "Emal")
-                        Spacer(modifier = Modifier.padding(6.dp))
-                        Text(text = "sahko.jorma@gmail.com")
-                    }
-                    Spacer(modifier = Modifier.padding(4.dp))
-                    Row(
-                        modifier = Modifier,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Plan")
-                        Spacer(modifier = Modifier.padding(6.dp))
-                        Text(text = "Omavoima super halpa")
-                    }
+                    Icon(imageVector = Icons.Default.Home, contentDescription = "Home")
+                    Spacer(modifier = Modifier.padding(6.dp))
+                    Text(text = "Valkyriankatu 12 C 36")
+                }
+                Spacer(modifier = Modifier.padding(4.dp))
+                Row(
+                    modifier = Modifier, horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
+                    Spacer(modifier = Modifier.padding(6.dp))
+                    Text(text = "Sopimukset")
+                }
+                Spacer(modifier = Modifier.padding(4.dp))
+                Row(
+                    modifier = Modifier, horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Icon(imageVector = Icons.Default.Email, contentDescription = "Emal")
+                    Spacer(modifier = Modifier.padding(6.dp))
+                    Text(text = "sahko.jorma@gmail.com")
+                }
+                Spacer(modifier = Modifier.padding(4.dp))
+                Row(
+                    modifier = Modifier, horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Plan")
+                    Spacer(modifier = Modifier.padding(6.dp))
+                    Text(text = "Omavoima super halpa")
                 }
             }
         }
     }
 }
-
-/*
-@Preview(showBackground = true)
-
-@Composable
-fun DefaultPreview() {
-    ProfileDetails()
-}
- */
