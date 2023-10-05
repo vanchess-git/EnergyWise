@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
 import com.example.energywizeapp.ui.navigation.mainNavigator.MainNavigator
 import com.example.energywizeapp.ui.theme.EnergyWizeAppTheme
 
