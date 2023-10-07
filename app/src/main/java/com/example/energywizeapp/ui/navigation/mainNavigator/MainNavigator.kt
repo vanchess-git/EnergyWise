@@ -34,6 +34,7 @@ import com.example.energywizeapp.ProfileDetails
 import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
 import com.example.energywizeapp.ui.composables.TimeFrameTypeItem
 import com.example.energywizeapp.ui.composables.TimeFrameTypeSelector
+import com.example.energywizeapp.ui.screens.TestView
 
 @Composable
 fun MainNavigator(
@@ -50,29 +51,6 @@ fun MainNavigator(
      *           make it show here too.
      *  route: is just for navigator to differentiate paths from each other.
      *  */
-
-    val listOfTimeTypes = listOf(
-        TimeFrameTypeItem(
-            timeType = "day",
-            visibleName = "Day",
-        ),
-        TimeFrameTypeItem(
-            timeType = "week",
-            visibleName = "Week",
-        ),
-        TimeFrameTypeItem(
-            timeType = "month",
-            visibleName = "Month",
-        ),
-        TimeFrameTypeItem(
-            timeType = "year",
-            visibleName = "Year",
-        ),
-    )
-
-    var selectedTimeTypeIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
 
     val items = listOf(
         MainNavItem(
@@ -166,12 +144,7 @@ fun MainNavigator(
         NavHost(navController = navController, startDestination = "home", Modifier.padding(innerPadding)) {
             composable("profile") { ProfileDetails() }
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
-            composable("home") {4
-            Column {
-                TimeFramePlusMinus()
-                TimeFrameTypeSelector(listOfTimeTypes = listOfTimeTypes, selectedTimeTypeIndex = selectedTimeTypeIndex)
-            }
-            }
+            composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
         }
     }
