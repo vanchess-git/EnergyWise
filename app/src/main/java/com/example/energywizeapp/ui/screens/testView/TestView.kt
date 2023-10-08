@@ -1,4 +1,4 @@
-package com.example.energywizeapp.ui.screens
+package com.example.energywizeapp.ui.screens.testView
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +13,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
 import com.example.energywizeapp.ui.composables.timeFrameType.TimeFrameTypeSelector
 
+/** this view was made for creating the timeframe navigation UI elements and their logic.
+ * more info found in the testViewModel.kt file */
 @Preview(
     showBackground = true
 )

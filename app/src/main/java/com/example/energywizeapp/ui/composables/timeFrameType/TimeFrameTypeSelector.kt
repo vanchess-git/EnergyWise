@@ -29,8 +29,7 @@ fun TimeFrameTypeSelector(
 ) {
     Surface(
         modifier = modifier
-            .fillMaxWidth()
-            .border(shape = RectangleShape, width = 1.dp, color = Color.Black),
+            .fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier

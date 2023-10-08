@@ -33,11 +33,63 @@ fun TimeFramePlusMinus(
     time: Long = 0L,
     calendar: Calendar = Calendar.getInstance(),
 ) {
+    when (timeFrameType) {
+        "day" -> { SelectedDay(
+            modifier = modifier,
+            timeFrameType = timeFrameType,
+            decrement = decrement,
+            increment = increment,
+            time = time,
+            calendar = calendar,
+        ) }
+        "week" -> { SelectedWeek(
+            modifier = modifier,
+            timeFrameType = timeFrameType,
+            decrement = decrement,
+            increment = increment,
+            time = time,
+            calendar = calendar,
+        ) }
+        "month" -> { SelectedMonth(
+            modifier = modifier,
+            timeFrameType = timeFrameType,
+            decrement = decrement,
+            increment = increment,
+            time = time,
+            calendar = calendar,
+        ) }
+        "year" -> { SelectedYear(
+            modifier = modifier,
+            timeFrameType = timeFrameType,
+            decrement = decrement,
+            increment = increment,
+            time = time,
+            calendar = calendar,
+        ) }
+        else -> { SelectedDay(
+            modifier = modifier,
+            timeFrameType = timeFrameType,
+            decrement = decrement,
+            increment = increment,
+            time = time,
+            calendar = calendar,
+        ) }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+private fun SelectedDay(
+    modifier: Modifier = Modifier,
+    timeFrameType: String = "day",
+    decrement: () -> Unit = {  },
+    increment: () -> Unit = {  },
+    time: Long = 0L,
+    calendar: Calendar = Calendar.getInstance(),
+) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     Surface(
         modifier = modifier
-            .fillMaxWidth()
-            .border(shape = RectangleShape, width = 1.dp, color = Color.Black),
+            .fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier
@@ -45,16 +97,196 @@ fun TimeFramePlusMinus(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            IconButton(onClick = decrement) {
+            IconButton(
+                onClick = decrement,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
                     contentDescription = "decrease"
                 )
             }
-            Text(text = dateFormat.format(time).toString())
-            Text(text = timeFrameType)
+            Row(
+                modifier = Modifier
+                    .weight(3f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Text(text = "date: ")
+                Text(text = dateFormat.format(time).toString())
+            }
+            IconButton(
+                onClick = increment,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "increase"
+                )
+            }
+        }
+    }
+}
 
-            IconButton(onClick = increment) {
+@Preview(showBackground = true)
+@Composable
+private fun SelectedWeek(
+    modifier: Modifier = Modifier,
+    timeFrameType: String = "week",
+    decrement: () -> Unit = {  },
+    increment: () -> Unit = {  },
+    time: Long = 0L,
+    calendar: Calendar = Calendar.getInstance(),
+) {
+    val dateFormat = SimpleDateFormat("yyyy", Locale.getDefault())
+    calendar.timeInMillis = time
+    Surface(
+        modifier = modifier
+            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            IconButton(
+                onClick = decrement,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = "decrease"
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .weight(3f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Text(text = "week:")
+                Text(text = calendar.get(Calendar.WEEK_OF_YEAR).toString())
+                Text(text = dateFormat.format(time).toString())
+            }
+            IconButton(
+                onClick = increment,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "increase"
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SelectedMonth(
+    modifier: Modifier = Modifier,
+    timeFrameType: String = "month",
+    decrement: () -> Unit = {  },
+    increment: () -> Unit = {  },
+    time: Long = 0L,
+    calendar: Calendar = Calendar.getInstance(),
+) {
+    val dateFormat = SimpleDateFormat("yyyy", Locale.getDefault())
+    val monthFormat = SimpleDateFormat("MMMM", Locale.getDefault())
+    calendar.timeInMillis = time
+    Surface(
+        modifier = modifier
+            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            IconButton(
+                onClick = decrement,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = "decrease"
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .weight(3f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Text(text = monthFormat.format(calendar.time))
+                Text(text = dateFormat.format(time).toString())
+            }
+            IconButton(
+                onClick = increment,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "increase"
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SelectedYear(
+    modifier: Modifier = Modifier,
+    timeFrameType: String = "year",
+    decrement: () -> Unit = {  },
+    increment: () -> Unit = {  },
+    time: Long = 0L,
+    calendar: Calendar = Calendar.getInstance(),
+) {
+    val dateFormat = SimpleDateFormat("yyyy", Locale.getDefault())
+    Surface(
+        modifier = modifier
+            .fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            IconButton(
+                onClick = decrement,
+                modifier = Modifier
+                    .weight(1f),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = "decrease"
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .weight(3f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                Text(text = "year:")
+                Text(text = dateFormat.format(time).toString())
+            }
+            IconButton(
+                onClick = increment,
+                modifier = Modifier
+                        .weight(1f),
+            ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "increase"

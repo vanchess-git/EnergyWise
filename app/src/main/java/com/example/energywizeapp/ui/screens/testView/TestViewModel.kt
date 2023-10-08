@@ -1,4 +1,4 @@
-package com.example.energywizeapp.ui.screens
+package com.example.energywizeapp.ui.screens.testView
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +10,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 
+/** this viewModel was made for creating the timeframe navigation UI elements and their logic.
+ * for the timeframe navigators to work you need to copy everything from here and TestView.kt
+ * to your view and viewModel.
+ *
+ * most important stuff to use for filtering are:
+ *      val time
+ *      selectedTimeTypeIndex
+ *      val listOfTimeTypes
+ *
+ * technically we wouldn't need the listOfTimeTypes, they are just for giving the types a better name.
+ *
+ * time is in timestamp format, so when using it to filtering keep that in mind.*/
 class TestViewModel: ViewModel() {
     // index for the current time type, used for highlighting the correct button in the UI
     private val _selectedTimeTypeIndex = MutableStateFlow(0)
@@ -23,7 +35,11 @@ class TestViewModel: ViewModel() {
 
     // calendar is used for time formatting and getting the time
     private val _calendar = MutableStateFlow(CalendarState(Calendar.getInstance()))
-    val calendar: StateFlow<Calendar> get() = _calendar.map { it.calendar }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Calendar.getInstance())
+    val calendar: StateFlow<Calendar>
+        get() = _calendar.map { it.calendar }.stateIn(viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            Calendar.getInstance()
+        )
     // time
     private val _time = MutableStateFlow(calendar.value.timeInMillis)
     val time: StateFlow<Long> = _time.asStateFlow()
@@ -116,4 +132,3 @@ class TestViewModel: ViewModel() {
 }
 
 private data class CalendarState(val calendar: Calendar)
-

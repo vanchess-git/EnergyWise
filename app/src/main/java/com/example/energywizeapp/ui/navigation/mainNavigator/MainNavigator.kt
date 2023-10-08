@@ -30,7 +30,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ProfileDetails
-import com.example.energywizeapp.ui.screens.TestView
+import com.example.energywizeapp.ui.screens.testView.TestView
 
 @Composable
 fun MainNavigator(
