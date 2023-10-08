@@ -1,4 +1,4 @@
-package com.example.energywizeapp.ui.composables
+package com.example.energywizeapp.ui.composables.timeFrameType
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -18,9 +18,14 @@ import androidx.compose.ui.unit.dp
 fun TimeFrameTypeSelector(
     modifier: Modifier = Modifier,
     timeFrameType: String? = null,
-    onClick: () -> Unit? = {  },
-    listOfTimeTypes: List<TimeFrameTypeItem>? = null,
-    selectedTimeTypeIndex: Int = 1,
+    onClick: (Int) -> Unit? = {  },
+    listOfTimeTypes: List<String> = listOf(
+        "day",
+        "week",
+        "month",
+        "year",
+    ),
+    selectedTimeTypeIndex: Int = 0,
 ) {
     Surface(
         modifier = modifier
@@ -39,6 +44,7 @@ fun TimeFrameTypeSelector(
                     timeFrameTypeItem = item,
                     selectedTimeTypeIndex = selectedTimeTypeIndex,
                     index = index,
+                    onClick = { onClick(index) }
                     )
             }
         }

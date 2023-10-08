@@ -19,15 +19,21 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Preview(showBackground = true, showSystemUi = false)
 @Composable
 fun TimeFramePlusMinus(
     modifier: Modifier = Modifier,
-    timestamp: Timestamp? = null,
-    timeFrameType: String? = null,
-    onClick: () -> Unit? = {  },
+    timeFrameType: String = "day",
+    decrement: () -> Unit = {  },
+    increment: () -> Unit = {  },
+    time: Long = 0L,
+    calendar: Calendar = Calendar.getInstance(),
 ) {
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -39,14 +45,16 @@ fun TimeFramePlusMinus(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = decrement) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
                     contentDescription = "decrease"
                 )
             }
-            Text(text = "25.11.2023")
-            IconButton(onClick = { /*TODO*/ }) {
+            Text(text = dateFormat.format(time).toString())
+            Text(text = timeFrameType)
+
+            IconButton(onClick = increment) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "increase"

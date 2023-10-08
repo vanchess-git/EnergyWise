@@ -1,49 +1,48 @@
 package com.example.energywizeapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
-import com.example.energywizeapp.ui.composables.TimeFrameTypeItem
-import com.example.energywizeapp.ui.composables.TimeFrameTypeSelector
+import com.example.energywizeapp.ui.composables.timeFrameType.TimeFrameTypeSelector
 
 @Preview(
     showBackground = true
 )
 @Composable
 fun TestView(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    testViewModel: TestViewModel = viewModel()
 ) {
-    val listOfTimeTypes = listOf(
-        TimeFrameTypeItem(
-            timeType = "day",
-            visibleName = "Day",
-        ),
-        TimeFrameTypeItem(
-            timeType = "week",
-            visibleName = "Week",
-        ),
-        TimeFrameTypeItem(
-            timeType = "month",
-            visibleName = "Month",
-        ),
-        TimeFrameTypeItem(
-            timeType = "year",
-            visibleName = "Year",
-        ),
-    )
+    val selectedTimeTypeIndex by testViewModel.selectedTimeTypeIndex.collectAsState()
+    val listOfTimeTypes by testViewModel.listOfTimeTypes.collectAsState()
+    val calendar by testViewModel.calendar.collectAsState()
+    val time by testViewModel.time.collectAsState()
+    val timeIncrement: () -> Unit = { testViewModel.timeIncrement() }
+    val timeDecrement: () -> Unit = { testViewModel.timeDecrement() }
 
-    var selectedTimeTypeIndex by rememberSaveable {
-        mutableStateOf(0)
-    }
 
     Column {
-        TimeFramePlusMinus()
-        TimeFrameTypeSelector(listOfTimeTypes = listOfTimeTypes, selectedTimeTypeIndex = selectedTimeTypeIndex)
+        Spacer(modifier = Modifier.height(32.dp))
+        TimeFramePlusMinus(
+            timeFrameType = listOfTimeTypes[selectedTimeTypeIndex],
+            decrement = timeDecrement,
+            increment = timeIncrement,
+            time = time,
+            calendar = calendar,
+            )
+        Spacer(modifier = Modifier.height(32.dp))
+        TimeFrameTypeSelector(
+            listOfTimeTypes = listOfTimeTypes,
+            selectedTimeTypeIndex = selectedTimeTypeIndex,
+            onClick = { index -> testViewModel.setTimeTypeIndex(index)}
+        )
     }
 }

@@ -2,7 +2,6 @@
 
 package com.example.energywizeapp.ui.navigation.mainNavigator
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -31,9 +30,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ProfileDetails
-import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
-import com.example.energywizeapp.ui.composables.TimeFrameTypeItem
-import com.example.energywizeapp.ui.composables.TimeFrameTypeSelector
 import com.example.energywizeapp.ui.screens.TestView
 
 @Composable
