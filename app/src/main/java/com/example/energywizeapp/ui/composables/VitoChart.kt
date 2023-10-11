@@ -26,6 +26,9 @@ import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.energywizeapp.data.api.ApiResponse
+import com.example.energywizeapp.data.api.PriceData
+import com.example.energywizeapp.data.api.RetrofitClient
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -45,9 +48,20 @@ import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun VitoChart() {
+    var priceDataList: List<PriceData>
+
+
     val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     val bottomAxisValueFormatterDay =
         AxisValueFormatter<AxisPosition.Horizontal.Bottom> { x, _ -> daysOfWeek[x.toInt() % daysOfWeek.size] }
@@ -96,6 +110,7 @@ fun VitoChart() {
     val scrollState = rememberChartScrollState()
 
     LaunchedEffect(key1 = refreshDataset.intValue) {
+
         datasetForModel.clear()
         datasetLineSpec.clear()
         var xPos = 0f
@@ -113,17 +128,42 @@ fun VitoChart() {
                 )
             )
         )
-        for (i in 1..24) {
-            val randomYFloat = (1..15).random().toFloat()
 
-            dataPoints.add(FloatEntry(x = xPos, y = randomYFloat))
-            xPos += 1f
-        }
+        val call = RetrofitClient.apiService.getLatestPrices()
+        call.enqueue(object : Callback<ApiResponse> {
+            override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+                if (response.isSuccessful) {
+                    priceDataList = response.body()?.prices!!
+                    val filteredPriceDataList = filterPricesForToday(priceDataList)
+                    Log.d("data", filteredPriceDataList.toString())
 
-        Log.d("datapoints", dataPoints.toString())
-        datasetForModel.add(dataPoints)
+                    val sortedPriceDataList = filteredPriceDataList.sortedBy { priceData ->
+                        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                            .parse(priceData.startDate)
+                    }
+                    for (priceData in sortedPriceDataList) {
+                        val price = priceData.price
 
-        modelProducer.setEntries(datasetForModel)
+                        dataPoints.add(FloatEntry(x = xPos, y = price.toFloat()))
+                        xPos += 1f
+                    }
+                    Log.d("datapoints", dataPoints.toString())
+                    datasetForModel.add(dataPoints)
+
+                    modelProducer.setEntries(datasetForModel)
+                } else {
+                    // TODO
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+                // TODO
+            }
+        })
+
+
+
+
 
     }
 
@@ -176,5 +216,20 @@ fun VitoChart() {
                 )
             }
         }
+    }
+}
+
+fun filterPricesForToday(priceDataList: List<PriceData>): List<PriceData> {
+    val currentDate = Date()
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val currentDay = sdf.format(currentDate)
+
+    return priceDataList.filter { priceData ->
+        val startDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            .parse(priceData.startDate)
+        startDate?.let {
+            val dayOfPrice = sdf.format(startDate)
+            dayOfPrice == currentDay
+        } ?: false
     }
 }

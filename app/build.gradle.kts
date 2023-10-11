@@ -93,4 +93,8 @@ dependencies {
 
     // For the view system.
     implementation("com.patrykandpatrick.vico:views:1.12.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
