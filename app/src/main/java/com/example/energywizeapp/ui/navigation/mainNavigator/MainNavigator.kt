@@ -30,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ProfileDetails
+import com.example.energywizeapp.ui.screens.testView.TestView
 
 @Composable
 fun MainNavigator(
@@ -46,6 +47,7 @@ fun MainNavigator(
      *           make it show here too.
      *  route: is just for navigator to differentiate paths from each other.
      *  */
+
     val items = listOf(
         MainNavItem(
             title = "Profile",
@@ -138,7 +140,7 @@ fun MainNavigator(
         NavHost(navController = navController, startDestination = "home", Modifier.padding(innerPadding)) {
             composable("profile") { ProfileDetails() }
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
-            composable("home") { /*TODO: call the proper view composable */ }
+            composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
         }
     }
