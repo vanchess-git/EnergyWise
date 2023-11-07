@@ -90,6 +90,7 @@ private fun SelectedDay(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -113,7 +114,6 @@ private fun SelectedDay(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "date: ")
                 Text(text = dateFormat.format(time).toString())
             }
             IconButton(
@@ -145,6 +145,7 @@ private fun SelectedWeek(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -168,7 +169,6 @@ private fun SelectedWeek(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "week:")
                 Text(text = calendar.get(Calendar.WEEK_OF_YEAR).toString())
                 Text(text = dateFormat.format(time).toString())
             }
@@ -202,6 +202,7 @@ private fun SelectedMonth(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -256,6 +257,7 @@ private fun SelectedYear(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -279,7 +281,6 @@ private fun SelectedYear(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "year:")
                 Text(text = dateFormat.format(time).toString())
             }
             IconButton(

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 
 private fun selectedColor(index: Int, selectedTimeTypeIndex: Int): Color {
     if (index == selectedTimeTypeIndex) {
-        return Color(0xff0000ff)
+        return Color(0xFF00D1FF)
     } else {
         return Color(0xffffffff)
     }

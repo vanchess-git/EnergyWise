@@ -1,5 +1,6 @@
 package com.example.energywizeapp.ui.composables.timeFrameType
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ fun TimeFrameTypeSelector(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000)
     ) {
         Row(
             modifier = Modifier
