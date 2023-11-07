@@ -1,5 +1,6 @@
 package com.example.energywizeapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -29,13 +30,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
 import com.example.energywizeapp.ui.navigation.mainNavigator.MainNavigator
 import com.example.energywizeapp.ui.theme.EnergyWizeAppTheme
 
 // TODO service can be launched, but it is not aware of correct instancing
 // TODO handle Context related stuff
 class MainActivity : ComponentActivity() {
+    fun startNotSer() {
+        startService(Intent(this@MainActivity, NotificationService::class.java))
+    }
+    fun stopNotSer() {
+        stopService(Intent(this@MainActivity, NotificationService::class.java))
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,6 +54,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 }
 
