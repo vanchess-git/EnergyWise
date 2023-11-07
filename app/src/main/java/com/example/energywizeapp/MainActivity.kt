@@ -33,6 +33,8 @@ import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
 import com.example.energywizeapp.ui.navigation.mainNavigator.MainNavigator
 import com.example.energywizeapp.ui.theme.EnergyWizeAppTheme
 
+// TODO service can be launched, but it is not aware of correct instancing
+// TODO handle Context related stuff
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
