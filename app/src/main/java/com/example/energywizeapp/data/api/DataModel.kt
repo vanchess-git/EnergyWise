@@ -2,6 +2,7 @@ package com.example.energywizeapp.data.api
 
 import com.google.gson.annotations.SerializedName
 
+// Old Version
 data class ApiResponse(
     @SerializedName("prices") val prices: List<PriceData>
 )

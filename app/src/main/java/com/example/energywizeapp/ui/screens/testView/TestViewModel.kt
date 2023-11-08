@@ -1,114 +1,28 @@
-package com.example.energywizeapp.ui.screens.home
+package com.example.energywizeapp.ui.screens.testView
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.energywizeapp.data.api.EntsoResponse
-import com.example.energywizeapp.data.api.PriceRepository
-import com.example.energywizeapp.util.calculateMonthEnd
-import com.example.energywizeapp.util.calculateMonthStart
-import com.example.energywizeapp.util.calculateWeekEnd
-import com.example.energywizeapp.util.calculateWeekStart
-import com.example.energywizeapp.util.calculateYearEnd
-import com.example.energywizeapp.util.calculateYearStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
-class HomeViewModel: ViewModel() {
-    private val repository = PriceRepository()
-
-    val entsoResponseState = mutableStateOf<EntsoResponse?>(null)
-    fun fetchPrices(
-        timeFrame: String,
-        selectedDate: Long,
-        selectedWeek: Int?,
-        selectedMonth: String?,
-        selectedYear: Int?
-    ) {
-        viewModelScope.launch {
-            try {
-                Log.d("VicoChart TimeFrame", "$timeFrame, selected date: $selectedDate")
-                val (periodStart, periodEnd) = when (timeFrame) {
-                    "day" -> {
-                        if (selectedDate != null) {
-                            val formattedDate = SimpleDateFormat("yyyyMMdd", Locale.US).format(selectedDate)
-                            Log.d("VicoChart Day", formattedDate + "0000" + formattedDate + "2300")
-                            Pair(formattedDate + "0000", formattedDate + "2300")
-                        } else {
-                            Pair("", "")
-                        }
-                    }
-                    "week" -> {
-                        if (selectedWeek != null && selectedYear != null) {
-                            val weekStart = calculateWeekStart(selectedYear, selectedWeek)
-                            val weekEnd = calculateWeekEnd(selectedYear, selectedWeek)
-                            Pair(weekStart + "0000", weekEnd + "2300")
-                        } else {
-                            Pair("", "")
-                        }
-                    }
-                    "month" -> {
-                        if (selectedMonth != null && selectedYear != null) {
-                            val monthStart = calculateMonthStart(selectedYear, selectedMonth)
-                            val monthEnd = calculateMonthEnd(selectedYear, selectedMonth)
-                            Pair(monthStart + "0000", monthEnd + "2300")
-                        } else {
-                            Pair("", "")
-                        }
-                    }
-                    "year" -> {
-                        if (selectedYear != null) {
-                            val yearStart = calculateYearStart(selectedYear)
-                            val yearEnd = calculateYearEnd(selectedYear)
-                            Pair(yearStart + "0000", yearEnd + "2300")
-                        } else {
-                            Pair("", "")
-                        }
-                    }
-                    else -> {
-                        Pair("", "")
-                    }
-                }
-                Log.d("VicoChart Day", "start $periodStart end $periodEnd")
-
-                val publicationMarketDocument = repository.getPrices(
-                    securityToken = "4ede6fbc-1823-49bb-9be0-0801df9df8ef",
-                    documentType = "A44",
-                    inDomain = "10YFI-1--------U",
-                    outDomain = "10YFI-1--------U",
-                    periodStart = periodStart,
-                    periodEnd = periodEnd
-                )
-                val entsoResponse = EntsoResponse(publicationMarketDocument)
-
-                entsoResponseState.value = entsoResponse
-
-                val maxLogSize = 1000
-                val veryLongString = entsoResponse.toString()
-                val tag = "VicoChart Response"
-
-                for (i in 0..veryLongString.length / maxLogSize) {
-                    val start = i * maxLogSize
-                    var end = (i + 1) * maxLogSize
-                    end = if (end > veryLongString.length) veryLongString.length else end
-                    Log.v(tag, veryLongString.substring(start, end))
-                }
-
-            } catch (e: Exception) {
-                Log.e("error", e.message.toString())
-            }
-        }
-    }
-
+/** this viewModel was made for creating the timeframe navigation UI elements and their logic.
+ * for the timeframe navigators to work you need to copy everything from here and TestView.kt
+ * to your view and viewModel.
+ *
+ * most important stuff to use for filtering are:
+ *      val time
+ *      selectedTimeTypeIndex
+ *      val listOfTimeTypes
+ *
+ * technically we wouldn't need the listOfTimeTypes, they are just for giving the types a better name.
+ *
+ * time is in timestamp format, so when using it to filtering keep that in mind.*/
+class TestViewModel: ViewModel() {
     // index for the current time type, used for highlighting the correct button in the UI
     private val _selectedTimeTypeIndex = MutableStateFlow(0)
     val selectedTimeTypeIndex: StateFlow<Int> = _selectedTimeTypeIndex.asStateFlow()
