@@ -2,6 +2,12 @@
 
 package com.example.energywizeapp.ui.navigation.mainNavigator
 
+import android.content.Context
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -20,21 +26,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ProfileDetails
+import com.example.energywizeapp.ui.authentification.GoogleAuthUiClient
+import com.example.energywizeapp.ui.screens.SignInView.SignInView
+import com.example.energywizeapp.ui.screens.SignInView.SignInViewModel
 import com.example.energywizeapp.ui.screens.testView.TestView
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainNavigator(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** TO DO **/
+   // googleAuthUiClient: GoogleAuthUiClient,
+   // context: Context
 ) {
     val navController = rememberNavController()
     /** this is the list for navigation items
@@ -142,6 +159,61 @@ fun MainNavigator(
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
             composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
+
+            /*TODO: SIGN IN navigation*/
+            /*
+            composable("sign_in") {
+                val viewModel = viewModel<SignInViewModel>()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                LaunchedEffect(key1 = Unit) {
+                    if(googleAuthUiClient.getSignedInUser() != null) {
+                        navController.navigate("profile")
+                    }
+                }
+
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartIntentSenderForResult(),
+                    onResult = { result ->
+                        if(result.resultCode == ComponentActivity.RESULT_OK) {
+                            lifecycleScope.launch {
+                                val signInResult = googleAuthUiClient.signInWithIntent(
+                                    intent = result.data ?: return@launch
+                                )
+                                viewModel.onSignInResult(signInResult)
+                            }
+                        }
+                    }
+                )
+
+                LaunchedEffect(key1 = state.isSignInSuccessful) {
+                    if(state.isSignInSuccessful) {
+                        Toast.makeText(
+                            context,
+                            "Sign in successful",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        navController.navigate("profile")
+                        viewModel.resetState()
+                    }
+                }
+
+                SignInView(
+                    state = state,
+                    onSignInClick = {
+                        lifecycleScope.launch {
+                            val signInIntentSender = googleAuthUiClient.signIn()
+                            launcher.launch(
+                                IntentSenderRequest.Builder(
+                                    signInIntentSender ?: return@launch
+                                ).build()
+                            )
+                        }
+                    }
+                )
+            }
+            */
         }
     }
 }
