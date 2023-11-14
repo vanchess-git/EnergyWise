@@ -70,7 +70,6 @@ fun HomeView(
 
         Column() {
             if (entsoResponse != null) {
-                Text("mRID: ${entsoResponse.publicationMarketDocument.mRID}")
                 VicoChart(entsoResponse)
             }
             Spacer(modifier = Modifier.height(32.dp))

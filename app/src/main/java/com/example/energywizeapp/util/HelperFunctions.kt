@@ -1,5 +1,6 @@
 package com.example.energywizeapp.util
 
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -91,4 +92,17 @@ fun calculateYearEnd(selectedYear: Int): String {
     calendar.add(Calendar.DAY_OF_YEAR, -1)
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
+}
+fun isDateToday(dateTimeString: String?): Boolean {
+    dateTimeString ?: return false
+
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    val date = Calendar.getInstance().time
+    val currentDate = dateFormat.format(date)
+    val dataDate = dateFormat.parse(dateTimeString)
+
+    val dataDateString = dateFormat.format(dataDate)
+    Log.d("HelperFunctions", "$currentDate $dateTimeString")
+
+    return currentDate == dataDateString
 }

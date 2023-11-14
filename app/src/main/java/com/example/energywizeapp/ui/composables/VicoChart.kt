@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.energywizeapp.data.api.EntsoResponse
+import com.example.energywizeapp.util.isDateToday
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -41,6 +42,10 @@ import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun VicoChart(priceData: EntsoResponse) {
@@ -81,15 +86,28 @@ fun VicoChart(priceData: EntsoResponse) {
             )
         )
 
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        var currentHourPrice: Double? = null
+
         for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
+
+
             val timeInterval = timeSeries.period?.timeInterval
-            val startDateTime = timeInterval?.start
+            val startDateTime = timeInterval?.end
             Log.d("VicoChart timeInterval", timeInterval.toString())
             for (point in timeSeries.period?.points ?: emptyList()) {
 
                 val position = point.position
-                val priceAmount = point.priceAmount
+                val priceAmountBeforeVAT = (point.priceAmount * 0.1)
+                val priceAmountBeforeFormatting = priceAmountBeforeVAT * (1 + 0.24)
+                val priceAmount = BigDecimal(priceAmountBeforeFormatting).setScale(2, RoundingMode.HALF_UP).toDouble()
                 Log.d("VicoChart price and position", "${priceAmount}, pos $xPos $position")
+
+                if(isDateToday(startDateTime)) {
+                    if (position == currentHour) {
+                        currentHourPrice = priceAmount
+                    }
+                }
 
                 dataPoints.add(
                     FloatEntry(x = xPos, y = priceAmount.toFloat())
@@ -97,6 +115,11 @@ fun VicoChart(priceData: EntsoResponse) {
                 xPos += 1f
             }
         }
+
+        if (currentHourPrice != null) {
+            currentHourPriceTextState.value = "$currentHourPrice snt/kWh"
+        } 
+
         Log.d("VicoChart DataPoints", dataPoints.toString())
         datasetForModel.add(dataPoints)
         modelProducer.setEntries(datasetForModel)
