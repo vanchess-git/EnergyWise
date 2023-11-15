@@ -155,12 +155,13 @@ fun MainNavigator(
         }
     ) {innerPadding ->
         NavHost(navController = navController, startDestination = "home", Modifier.padding(innerPadding)) {
-            composable("profile") { ProfileDetails() }
+            composable("profile") { }
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
             composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
 
             /*TODO: SIGN IN navigation*/
+
             /*
             composable("sign_in") {
                 val viewModel = viewModel<SignInViewModel>()
@@ -213,7 +214,13 @@ fun MainNavigator(
                     }
                 )
             }
-            */
+            composable("profile") {
+                ProfileDetails(
+                )
+            }
+
+        */
         }
+
     }
 }
