@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "263088705362",
+    "project_id": "energywiseapp",
+    "storage_bucket": "energywiseapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:263088705362:android:f5babc5cd022e8bd70748b",
+        "android_client_info": {
+          "package_name": "com.example.energywizeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "263088705362-no22plbt3965g1gq730p254kpe5tb4kc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.energywizeapp",
+            "certificate_hash": "d7fb3c3dac8ad0f720309f7f00e5055c5677fd51"
+          }
+        },
+        {
+          "client_id": "263088705362-523agppvkmm0nnr1qg865lurv64rcquh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuZRK3JjYDcM7Dy6LeqHPJfhzhkv9c3zg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "263088705362-523agppvkmm0nnr1qg865lurv64rcquh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
