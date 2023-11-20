@@ -31,6 +31,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ProfileDetails
 import com.example.energywizeapp.ui.screens.testView.TestView
+import com.example.energywizeapp.ui.screens.testView.signIn.SignInScreen
+import com.example.energywizeapp.ui.screens.testView.signUp.SignUpScreen
 
 @Composable
 fun MainNavigator(
@@ -142,6 +144,8 @@ fun MainNavigator(
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
             composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
+            composable("sigIn") { SignInScreen() }
+            composable("sigUn") { }
         }
     }
 }
