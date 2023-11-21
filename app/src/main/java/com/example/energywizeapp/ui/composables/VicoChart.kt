@@ -1,6 +1,7 @@
 package com.example.energywizeapp.ui.composables
 
 import android.graphics.Typeface
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,17 +41,20 @@ import com.patrykandpatrick.vico.compose.dimensions.dimensionsOf
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
 import com.patrykandpatrick.vico.core.DefaultAlpha
 import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.axis.AxisPosition
+import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
-
     val axisTitleHorizontalPaddingValue = 8.dp
     val axisTitleVerticalPaddingValue = 2.dp
     val axisTitlePadding =
@@ -71,7 +75,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
     LaunchedEffect(priceData) {
         datasetForModel.clear()
         datasetLineSpec.clear()
-        var xPos = 0f
+
         val dataPoints = arrayListOf<FloatEntry>()
         datasetLineSpec.add(
             LineChart.LineSpec(
@@ -91,30 +95,175 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
         var currentHourPrice: Double? = null
 
         val timeSpanInDays = calculateTimeSpanInDays(priceData)
+        var timeSpan = "day"
 
-        for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
-            val timeInterval = timeSeries.period?.timeInterval
-            val startDateTime = timeInterval?.end
+        when {
+            timeSpanInDays <= 1 -> timeSpan = "day"
+            timeSpanInDays <= 7 -> timeSpan = "week"
+            timeSpanInDays <= 31 -> timeSpan = "month"
+            timeSpanInDays <= 365 -> timeSpan = "year"
+        }
 
-            for (point in timeSeries.period?.points ?: emptyList()) {
+        when (timeSpan) {
+            "day" -> {
+                Log.d("LaunchedEffect Data", timeSpan)
+                for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
+                    val timeInterval = timeSeries.period?.timeInterval
+                    val startDateTime = timeInterval?.end
+                    var xPos = 0f
+                    for (point in timeSeries.period?.points ?: emptyList()) {
+                        val position = point.position
+                        val priceAmountBeforeVAT = (point.priceAmount * 0.1)
+                        val priceAmountBeforeFormatting = priceAmountBeforeVAT * (1 + 0.24)
+                        val priceAmount = BigDecimal(priceAmountBeforeFormatting)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .toDouble()
 
-                val position = point.position
-                val priceAmountBeforeVAT = (point.priceAmount * 0.1)
-                val priceAmountBeforeFormatting = priceAmountBeforeVAT * (1 + 0.24)
-                val priceAmount = BigDecimal(priceAmountBeforeFormatting)
-                    .setScale(2, RoundingMode.HALF_UP)
-                    .toDouble()
+                        if(isDateToday(startDateTime) && selectedTimeFrame == "day") {
+                            if (position == currentHour) {
+                                currentHourPrice = priceAmount
+                            }
+                        }
 
-                if(isDateToday(startDateTime) && selectedTimeFrame == "day") {
-                    if (position == currentHour) {
-                        currentHourPrice = priceAmount
+                        dataPoints.add(
+                            FloatEntry(x = xPos, y = priceAmount.toFloat())
+                        )
+                        xPos += 1f
+                    }
+                }
+            }
+            "week" -> {
+                val dailyAverages = mutableMapOf<Int, Double>()
+                val dailyCounts = mutableMapOf<Int, Int>()
+
+                Log.d("LaunchedEffect Data", timeSpan)
+                for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
+                    val timeInterval = timeSeries.period?.timeInterval
+                    val startDateTime = timeInterval?.end
+
+                    for (point in timeSeries.period?.points ?: emptyList()) {
+                        val position = point.position
+                        val priceAmountBeforeVAT = (point.priceAmount * 0.1)
+                        val priceAmountBeforeFormatting = priceAmountBeforeVAT * (1 + 0.24)
+                        val priceAmount = BigDecimal(priceAmountBeforeFormatting)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .toDouble()
+
+                        if(isDateToday(startDateTime) && selectedTimeFrame == "day") {
+                            if (position == currentHour) {
+                                currentHourPrice = priceAmount
+                            }
+                        }
+
+                        val calendar = Calendar.getInstance()
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US)
+                        calendar.time = startDateTime?.let { dateFormat.parse(it) }!!
+                        val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+                        if (dailyAverages.containsKey(dayOfMonth)) {
+                            dailyAverages[dayOfMonth] = dailyAverages[dayOfMonth]!! + priceAmount
+                            dailyCounts[dayOfMonth] = dailyCounts[dayOfMonth]!! + 1
+                        } else {
+                            dailyAverages[dayOfMonth] = priceAmount
+                            dailyCounts[dayOfMonth] = 1
+                        }
                     }
                 }
 
-                dataPoints.add(
-                    FloatEntry(x = xPos, y = priceAmount.toFloat())
-                )
-                xPos += 1f
+                for ((day, totalAmount) in dailyAverages) {
+                    val average = totalAmount / dailyCounts[day]!!
+                    dataPoints.add(FloatEntry(x = day.toFloat(), y = average.toFloat()))
+                }
+            }
+            "month" -> {
+                val dailyAverages = mutableMapOf<Int, Double>()
+                val dailyCounts = mutableMapOf<Int, Int>()
+
+                Log.d("LaunchedEffect Data", timeSpan)
+                for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
+                    val timeInterval = timeSeries.period?.timeInterval
+                    val startDateTime = timeInterval?.end
+
+                    for (point in timeSeries.period?.points ?: emptyList()) {
+                        val position = point.position
+                        val priceAmountBeforeVAT = (point.priceAmount * 0.1)
+                        val priceAmountBeforeFormatting = priceAmountBeforeVAT * (1 + 0.24)
+                        val priceAmount = BigDecimal(priceAmountBeforeFormatting)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .toDouble()
+
+                        if(isDateToday(startDateTime) && selectedTimeFrame == "day") {
+                            if (position == currentHour) {
+                                currentHourPrice = priceAmount
+                            }
+                        }
+
+                        val calendar = Calendar.getInstance()
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US)
+                        calendar.time = startDateTime?.let { dateFormat.parse(it) }!!
+                        val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+
+                        if (dailyAverages.containsKey(dayOfMonth)) {
+                            dailyAverages[dayOfMonth] = dailyAverages[dayOfMonth]!! + priceAmount
+                            dailyCounts[dayOfMonth] = dailyCounts[dayOfMonth]!! + 1
+                        } else {
+                            dailyAverages[dayOfMonth] = priceAmount
+                            dailyCounts[dayOfMonth] = 1
+                        }
+                    }
+                }
+
+                for ((day, totalAmount) in dailyAverages) {
+                    val average = totalAmount / dailyCounts[day]!!
+                    dataPoints.add(FloatEntry(x = day.toFloat(), y = average.toFloat()))
+                }
+
+            }
+            "year" -> {
+                val monthlyAverages = mutableMapOf<Int, Double>()
+                val monthlyCounts = mutableMapOf<Int, Int>()
+
+                Log.d("LaunchedEffect Data", timeSpan)
+                for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
+                    val timeInterval = timeSeries.period?.timeInterval
+                    val startDateTime = timeInterval?.end
+
+                    for (point in timeSeries.period?.points ?: emptyList()) {
+                        val position = point.position
+                        val priceAmountBeforeVAT = (point.priceAmount * 0.1)
+                        val priceAmountBeforeFormatting = priceAmountBeforeVAT * (1 + 0.24)
+                        val priceAmount = BigDecimal(priceAmountBeforeFormatting)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .toDouble()
+
+                        if (isDateToday(startDateTime) && selectedTimeFrame == "day") {
+                            if (position == currentHour) {
+                                currentHourPrice = priceAmount
+                            }
+                        }
+
+                        val calendar = Calendar.getInstance()
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US)
+                        calendar.time = startDateTime?.let { dateFormat.parse(it) }!!
+                        val monthOfYear = calendar.get(Calendar.MONTH)
+
+                        if (monthlyAverages.containsKey(monthOfYear)) {
+                            monthlyAverages[monthOfYear] = monthlyAverages[monthOfYear]!! + priceAmount
+                            monthlyCounts[monthOfYear] = monthlyCounts[monthOfYear]!! + 1
+                        } else {
+                            monthlyAverages[monthOfYear] = priceAmount
+                            monthlyCounts[monthOfYear] = 1
+                        }
+                    }
+                }
+
+                for ((month, totalAmount) in monthlyAverages) {
+                    val average = totalAmount / monthlyCounts[month]!!
+                    dataPoints.add(FloatEntry(x = month.toFloat(), y = average.toFloat()))
+                }
+            }
+            else -> {
+                // TODO
             }
         }
 
@@ -179,7 +328,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                         isZoomEnabled = false,
                         chartScrollState = scrollState,
                         startAxis = rememberStartAxis(
-                            title = "Hinta",
+                            title = "c/kWh",
                             tickLength = 0.dp,
                             itemPlacer = AxisItemPlacer.Vertical.default(
                                 maxItemCount = 6
@@ -192,7 +341,6 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                                 ),
                         ),
                         bottomAxis = rememberBottomAxis(
-                            title = "Aika",
                             tickLength = 0.dp,
                             guideline = null,
                             titleComponent = textComponent(
@@ -201,7 +349,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                                 margins = bottomAxisTitleMargins,
                                 typeface = Typeface.MONOSPACE,
                                 ),
-                            )
+                            ),
                     )
                 }
             }
