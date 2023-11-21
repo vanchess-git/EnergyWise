@@ -6,34 +6,11 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Namespace
 import org.simpleframework.xml.Root
-import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-// Old version
-/*
-interface ApiService {
-    @GET("v1/latest-prices.json")
-    fun getLatestPrices(): Call<ApiResponse>
-}
-
-object RetrofitClient {
-    private const val BASE_URL = "https://api.porssisahko.net/"
-
-    val apiService: ApiService by lazy {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        retrofit.create(ApiService::class.java)
-    }
-}
-*/
-
-// Entso E
 object EntsoRetrofitClient {
     private const val BASE_URL = "https://web-api.tp.entsoe.eu"
 

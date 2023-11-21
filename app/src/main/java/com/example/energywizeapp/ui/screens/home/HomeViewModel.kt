@@ -28,38 +28,35 @@ class HomeViewModel: ViewModel() {
 
     val entsoResponseState = mutableStateOf<EntsoResponse?>(null)
     fun fetchPrices(
-        timeFrame: String,
-        selectedDate: Long,
-        selectedWeek: Int?,
-        selectedMonth: String?,
-        selectedYear: Int?
+        timeFrame: String?,
+        selectedDate: Long?,
+        selectedWeek: Long?,
+        selectedMonth: Long?,
+        selectedYear: Long?
     ) {
         viewModelScope.launch {
             try {
-                Log.d("VicoChart TimeFrame", "$timeFrame, selected date: $selectedDate")
+                setLoadingState(true)
                 val (periodStart, periodEnd) = when (timeFrame) {
                     "day" -> {
-                        if (selectedDate != null) {
+                        run {
                             val formattedDate = SimpleDateFormat("yyyyMMdd", Locale.US).format(selectedDate)
-                            Log.d("VicoChart Day", formattedDate + "0000" + formattedDate + "2300")
                             Pair(formattedDate + "0000", formattedDate + "2300")
-                        } else {
-                            Pair("", "")
                         }
                     }
                     "week" -> {
-                        if (selectedWeek != null && selectedYear != null) {
-                            val weekStart = calculateWeekStart(selectedYear, selectedWeek)
-                            val weekEnd = calculateWeekEnd(selectedYear, selectedWeek)
+                        if (selectedWeek != null) {
+                            val weekStart = calculateWeekStart(selectedWeek)
+                            val weekEnd = calculateWeekEnd(selectedWeek)
                             Pair(weekStart + "0000", weekEnd + "2300")
                         } else {
                             Pair("", "")
                         }
                     }
                     "month" -> {
-                        if (selectedMonth != null && selectedYear != null) {
-                            val monthStart = calculateMonthStart(selectedYear, selectedMonth)
-                            val monthEnd = calculateMonthEnd(selectedYear, selectedMonth)
+                        if (selectedMonth != null) {
+                            val monthStart = calculateMonthStart(selectedMonth)
+                            val monthEnd = calculateMonthEnd(selectedMonth)
                             Pair(monthStart + "0000", monthEnd + "2300")
                         } else {
                             Pair("", "")
@@ -78,7 +75,6 @@ class HomeViewModel: ViewModel() {
                         Pair("", "")
                     }
                 }
-                Log.d("VicoChart Day", "start $periodStart end $periodEnd")
 
                 val publicationMarketDocument = repository.getPrices(
                     securityToken = "4ede6fbc-1823-49bb-9be0-0801df9df8ef",
@@ -105,8 +101,17 @@ class HomeViewModel: ViewModel() {
 
             } catch (e: Exception) {
                 Log.e("error", e.message.toString())
+            } finally {
+                setLoadingState(false)
             }
         }
+    }
+
+    private val _loadingState = MutableStateFlow(false)
+    val loadingState: StateFlow<Boolean> = _loadingState.asStateFlow()
+
+    fun setLoadingState(loading: Boolean) {
+        _loadingState.value = loading
     }
 
     // index for the current time type, used for highlighting the correct button in the UI
@@ -153,35 +158,80 @@ class HomeViewModel: ViewModel() {
     }
     private fun incrementDay() {
         val currentTime = _time.value
+        val comparisonCalendarInstance = Calendar.getInstance()
         val currentCalendar = Calendar.getInstance()
         currentCalendar.timeInMillis = currentTime
         currentCalendar.add(Calendar.DAY_OF_MONTH, 1)
+
+        var timeIsPast2PM = false
+        if(comparisonCalendarInstance[Calendar.HOUR_OF_DAY] > 14) {
+            timeIsPast2PM = true
+        }
+
+        if(comparisonCalendarInstance.timeInMillis < currentCalendar.timeInMillis) {
+            if (comparisonCalendarInstance[Calendar.DAY_OF_MONTH] == currentCalendar[Calendar.DAY_OF_MONTH] - 1) {
+                if(timeIsPast2PM) {
+                    val updatedTime = currentCalendar.timeInMillis
+                    _time.value = updatedTime
+                    Log.d("TIMEFRAME SELECTOR", _time.value.toString())
+                    return
+                }
+            }
+            Log.d("TIMEFRAME SELECTOR", "Cannot increment, data not available")
+            return
+        }
+
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun incrementWeek() {
         val currentTime = _time.value
         val currentCalendar = Calendar.getInstance()
+        val comparisonCalendarInstance = Calendar.getInstance()
         currentCalendar.timeInMillis = currentTime
         currentCalendar.add(Calendar.WEEK_OF_MONTH, 1)
+
+        if(comparisonCalendarInstance[Calendar.WEEK_OF_YEAR] < currentCalendar[Calendar.WEEK_OF_YEAR]) {
+            Log.d("TIMEFRAME SELECTOR", "Cannot increment, data not available")
+            return
+        }
+
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun incrementMonth() {
         val currentTime = _time.value
         val currentCalendar = Calendar.getInstance()
+        val comparisonCalendarInstance = Calendar.getInstance()
         currentCalendar.timeInMillis = currentTime
         currentCalendar.add(Calendar.MONTH, 1)
+
+        if(comparisonCalendarInstance[Calendar.MONTH] < currentCalendar[Calendar.MONTH]) {
+            Log.d("TIMEFRAME SELECTOR", "Cannot increment, data not available")
+            return
+        }
+
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun incrementYear() {
         val currentTime = _time.value
         val currentCalendar = Calendar.getInstance()
+        val comparisonCalendarInstance = Calendar.getInstance()
         currentCalendar.timeInMillis = currentTime
         currentCalendar.add(Calendar.YEAR, 1)
+
+        if(comparisonCalendarInstance[Calendar.YEAR] < currentCalendar[Calendar.YEAR]) {
+            Log.d("TIMEFRAME SELECTOR", "Cannot increment, data not available")
+            return
+        }
+
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun decrementDay() {
         val currentTime = _time.value
@@ -190,6 +240,7 @@ class HomeViewModel: ViewModel() {
         currentCalendar.add(Calendar.DAY_OF_MONTH, -1)
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun decrementWeek() {
         val currentTime = _time.value
@@ -198,6 +249,7 @@ class HomeViewModel: ViewModel() {
         currentCalendar.add(Calendar.WEEK_OF_MONTH, -1)
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun decrementMonth() {
         val currentTime = _time.value
@@ -206,6 +258,7 @@ class HomeViewModel: ViewModel() {
         currentCalendar.add(Calendar.MONTH, -1)
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
     private fun decrementYear() {
         val currentTime = _time.value
@@ -214,6 +267,7 @@ class HomeViewModel: ViewModel() {
         currentCalendar.add(Calendar.YEAR, -1)
         val updatedTime = currentCalendar.timeInMillis
         _time.value = updatedTime
+        Log.d("TIMEFRAME SELECTOR", _time.value.toString())
     }
 }
 

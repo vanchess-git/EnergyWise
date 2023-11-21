@@ -1,95 +1,58 @@
 package com.example.energywizeapp.util
 
 import android.util.Log
+import com.example.energywizeapp.data.api.EntsoResponse
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
-fun calculateWeekStart(selectedYear: Int, selectedWeek: Int): String {
+fun calculateWeekStart(selectedWeek: Long): String {
     val calendar = Calendar.getInstance()
-    calendar.clear()
-    calendar.set(Calendar.YEAR, selectedYear)
-    calendar.set(Calendar.WEEK_OF_YEAR, selectedWeek)
+    calendar.timeInMillis = selectedWeek
+    calendar.firstDayOfWeek = Calendar.MONDAY
+    calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
 }
 
-fun calculateWeekEnd(selectedYear: Int, selectedWeek: Int): String {
+fun calculateWeekEnd(selectedWeek: Long): String {
     val calendar = Calendar.getInstance()
-    calendar.clear()
-    calendar.set(Calendar.YEAR, selectedYear)
-    calendar.set(Calendar.WEEK_OF_YEAR, selectedWeek)
-    calendar.add(Calendar.DAY_OF_YEAR, 6) // End of the week
+    calendar.timeInMillis = selectedWeek
+    calendar.firstDayOfWeek = Calendar.MONDAY
+    calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
 }
 
-fun calculateMonthStart(selectedYear: Int, selectedMonth: String): String {
-    val month = when (selectedMonth.lowercase(Locale.ROOT)) {
-        "january" -> Calendar.JANUARY
-        "february" -> Calendar.FEBRUARY
-        "march" -> Calendar.MARCH
-        "april" -> Calendar.APRIL
-        "may" -> Calendar.MAY
-        "june" -> Calendar.JUNE
-        "july" -> Calendar.JULY
-        "august" -> Calendar.AUGUST
-        "september" -> Calendar.SEPTEMBER
-        "october" -> Calendar.OCTOBER
-        "november" -> Calendar.NOVEMBER
-        "december" -> Calendar.DECEMBER
-        else -> Calendar.JANUARY // Default to January
-    }
-
+fun calculateMonthStart(selectedMonth: Long): String {
     val calendar = Calendar.getInstance()
-    calendar.clear()
-    calendar.set(Calendar.YEAR, selectedYear)
-    calendar.set(Calendar.MONTH, month)
+    calendar.timeInMillis = selectedMonth
+    calendar.set(Calendar.DAY_OF_MONTH, 1)
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
 }
 
-fun calculateMonthEnd(selectedYear: Int, selectedMonth: String): String {
+fun calculateMonthEnd(selectedMonth: Long): String {
     val calendar = Calendar.getInstance()
-    calendar.clear()
-    calendar.set(Calendar.YEAR, selectedYear)
-    val month = when (selectedMonth.lowercase(Locale.ROOT)) {
-        "january" -> Calendar.JANUARY
-        "february" -> Calendar.FEBRUARY
-        "march" -> Calendar.MARCH
-        "april" -> Calendar.APRIL
-        "may" -> Calendar.MAY
-        "june" -> Calendar.JUNE
-        "july" -> Calendar.JULY
-        "august" -> Calendar.AUGUST
-        "september" -> Calendar.SEPTEMBER
-        "october" -> Calendar.OCTOBER
-        "november" -> Calendar.NOVEMBER
-        "december" -> Calendar.DECEMBER
-        else -> Calendar.JANUARY // Default to January
-    }
-    calendar.set(Calendar.MONTH, month)
-    calendar.add(Calendar.MONTH, 1)
-    calendar.add(Calendar.DAY_OF_MONTH, -1)
+    calendar.timeInMillis = selectedMonth
+    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
 }
 
-fun calculateYearStart(selectedYear: Int): String {
+fun calculateYearStart(selectedYear: Long): String {
     val calendar = Calendar.getInstance()
-    calendar.clear()
-    calendar.set(Calendar.YEAR, selectedYear)
+    calendar.timeInMillis = selectedYear
+    calendar.set(Calendar.DAY_OF_YEAR, 1)
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
 }
 
-fun calculateYearEnd(selectedYear: Int): String {
+fun calculateYearEnd(selectedYear: Long): String {
     val calendar = Calendar.getInstance()
-    calendar.clear()
-    calendar.set(Calendar.YEAR, selectedYear)
-    calendar.add(Calendar.YEAR, 1)
-    calendar.add(Calendar.DAY_OF_YEAR, -1)
+    calendar.timeInMillis = selectedYear
+    calendar.set(Calendar.DAY_OF_YEAR, calendar.getActualMaximum(Calendar.DAY_OF_YEAR))
     val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.US)
     return dateFormat.format(calendar.time)
 }
@@ -105,4 +68,29 @@ fun isDateToday(dateTimeString: String?): Boolean {
     Log.d("HelperFunctions", "$currentDate $dateTimeString")
 
     return currentDate == dataDateString
+}
+
+// Function to calculate the time span covered by the data in days
+fun calculateTimeSpanInDays(priceData: EntsoResponse): Long {
+    val firstTimestamp = priceData.publicationMarketDocument.timeSeriesList?.firstOrNull()?.period?.timeInterval?.start
+    val lastTimestamp = priceData.publicationMarketDocument.timeSeriesList?.lastOrNull()?.period?.timeInterval?.end
+    Log.d("calculateTimeSpanInDays", "$firstTimestamp, $lastTimestamp")
+
+    if (firstTimestamp != null && lastTimestamp != null) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US)
+        try {
+            val firstDate = dateFormat.parse(firstTimestamp)
+            val lastDate = dateFormat.parse(lastTimestamp)
+
+            if (firstDate != null && lastDate != null) {
+                val differenceInMillis = lastDate.time - firstDate.time
+                Log.d("calculateTimeSpanInDays", "${TimeUnit.MILLISECONDS.toDays(differenceInMillis)}")
+                return TimeUnit.MILLISECONDS.toDays(differenceInMillis)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    return 0
 }
