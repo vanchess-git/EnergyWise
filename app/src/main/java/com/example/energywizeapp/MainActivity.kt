@@ -30,9 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.energywizeapp.ui.composables.TimeFramePlusMinus
 import com.example.energywizeapp.ui.navigation.mainNavigator.MainNavigator
+import com.example.energywizeapp.ui.navigation.mainNavigator.Screens
 import com.example.energywizeapp.ui.screens.testView.signIn.SignInScreen
+import com.example.energywizeapp.ui.screens.testView.signUp.SignUpScreen
 import com.example.energywizeapp.ui.theme.EnergyWizeAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigator()
+                    SignInScreen()
                 }
             }
         }

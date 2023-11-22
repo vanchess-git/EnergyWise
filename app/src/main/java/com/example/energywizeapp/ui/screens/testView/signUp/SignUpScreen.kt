@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.energywizeapp.ui.navigation.mainNavigator.Screens
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    navController: NavController,
+    navController: Screens.SignUpScreen,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     var email by rememberSaveable { mutableStateOf("") }
@@ -44,9 +43,14 @@ fun SignUpScreen(
     ) {
         Text(
             modifier = Modifier.padding(bottom = 10.dp),
+            text = "Welcome to EnergyWise",
+        )
+        Text(
+            modifier = Modifier.padding(bottom = 10.dp),
             text = "Create Account",
         )
         Text(
+            modifier = Modifier.padding(bottom = 10.dp),
             text = "Sign up"
             )
         TextField(
@@ -102,9 +106,9 @@ fun SignUpScreen(
             modifier = Modifier
                 .padding(15.dp)
                 .clickable {
-                    navController.navigate(Screens.SignInScreen.route)
+                    navController.route
                 },
-            text = "Already Have an account? Sign In",
+            text = "Already have an account? Sign In",
             fontWeight = FontWeight.Bold, color = Color.Black,
         )
     }

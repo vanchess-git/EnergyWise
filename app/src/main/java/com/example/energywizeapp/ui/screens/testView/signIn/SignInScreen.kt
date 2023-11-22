@@ -39,7 +39,7 @@ fun SignInScreen(
         verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Sign up",
+            text = "Sign in",
         )
         TextField(
             value = email,
@@ -68,6 +68,7 @@ fun SignInScreen(
                 scope.launch {
                     viewModel.loginUser(email, password)
                 }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,23 +82,22 @@ fun SignInScreen(
                 CircularProgressIndicator()
             }
         }
-            LaunchedEffect(key1 = state.value?.isSuccess) {
-                scope.launch {
-                    if (state.value?.isSuccess?.isNotEmpty() == true) {
-                        val success = state.value?.isSuccess
-                        Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
-                    }
+        LaunchedEffect(key1 = state.value?.isSuccess) {
+            scope.launch {
+                if (state.value?.isSuccess?.isNotEmpty() == true) {
+                    val success = state.value?.isSuccess
+                    Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
                 }
             }
-
-            LaunchedEffect(key1 = state.value?.isError) {
-                scope.launch {
-                    if (state.value?.isError?.isNotEmpty() == true) {
-                        val error = state.value?.isError
-                        Toast.makeText(context, "${error}", Toast.LENGTH_LONG).show()
-                    }
+        }
+        LaunchedEffect(key1 = state.value?.isError) {
+            scope.launch {
+                if (state.value?.isError?.isNotEmpty() == true) {
+                    val error = state.value?.isError
+                    Toast.makeText(context, "${error}", Toast.LENGTH_LONG).show()
                 }
             }
+        }
 
     }
 }

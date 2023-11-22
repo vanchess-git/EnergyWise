@@ -139,13 +139,13 @@ fun MainNavigator(
             }
         }
     ) {innerPadding ->
-        NavHost(navController = navController, startDestination = "home", Modifier.padding(innerPadding)) {
+        NavHost(navController = navController, startDestination = "signUp", Modifier.padding(innerPadding)) {
             composable("profile") { ProfileDetails() }
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
             composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
-            composable("sigIn") { SignInScreen() }
-            composable("sigUn") { }
+            composable("signIn") { SignInScreen() }
+            composable("signUp") { SignUpScreen(Screens.SignUpScreen) }
         }
     }
 }
