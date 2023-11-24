@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    navController: Screens.SignUpScreen,
+    //navController: Screens.SignUpScreen,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     var email by rememberSaveable { mutableStateOf("") }
@@ -106,7 +106,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .padding(15.dp)
                 .clickable {
-                    navController.route
+                   // navController.route
                 },
             text = "Already have an account? Sign In",
             fontWeight = FontWeight.Bold, color = Color.Black,
@@ -118,6 +118,7 @@ fun SignUpScreen(
             if (state.value?.isSuccess?.isNotEmpty() == true) {
                 val success = state.value?.isSuccess
                 Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
+                
             }
         }
     }

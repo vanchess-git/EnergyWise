@@ -145,7 +145,7 @@ fun MainNavigator(
             composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
             composable("signIn") { SignInScreen() }
-            composable("signUp") { SignUpScreen(Screens.SignUpScreen) }
+            composable("signUp") { SignUpScreen() }
         }
     }
 }
