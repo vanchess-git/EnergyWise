@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.energywizeapp.ui.navigation.mainNavigator.Screens
 import kotlinx.coroutines.launch
 
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
-    //navController: Screens.SignUpScreen,
+    navController: NavController,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     var email by rememberSaveable { mutableStateOf("") }
@@ -106,7 +107,8 @@ fun SignUpScreen(
             modifier = Modifier
                 .padding(15.dp)
                 .clickable {
-                   // navController.route
+                    /*TODO: navigate to SignIn*/
+                    navController.navigate(Screens.SignInScreen.route)
                 },
             text = "Already have an account? Sign In",
             fontWeight = FontWeight.Bold, color = Color.Black,
@@ -118,7 +120,8 @@ fun SignUpScreen(
             if (state.value?.isSuccess?.isNotEmpty() == true) {
                 val success = state.value?.isSuccess
                 Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
-                
+                /*TODO: navigate to Home*/
+                navController.navigate(Screens.ProfileDetailsScreen.route)
             }
         }
     }

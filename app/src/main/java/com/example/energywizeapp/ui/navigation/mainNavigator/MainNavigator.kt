@@ -39,6 +39,7 @@ fun MainNavigator(
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
+
     /** this is the list for navigation items
      *  if some route needs to be changed
      *  remember to implement the required changes to this list.
@@ -121,7 +122,7 @@ fun MainNavigator(
                                         Badge {
                                             Text(text = item.badgeCount.toString())
                                         }
-                                    } else if(item.hasNews) {
+                                    } else if (item.hasNews) {
                                         Badge()
                                     }
                                 }
@@ -138,14 +139,26 @@ fun MainNavigator(
                 }
             }
         }
-    ) {innerPadding ->
-        NavHost(navController = navController, startDestination = "signUp", Modifier.padding(innerPadding)) {
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            /*TODO: starting destination SignIn*/
+            startDestination = "signIn",
+            Modifier.padding(innerPadding)
+        ) {
             composable("profile") { ProfileDetails() }
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
             composable("home") { TestView() }
             composable("settings") { /*TODO: call the proper view composable */ }
-            composable("signIn") { SignInScreen() }
-            composable("signUp") { SignUpScreen() }
+
+            composable("signIn") {
+                SignInScreen(navController)
+
+            }
+            composable("signUp") {
+                SignUpScreen(navController)
+
+            }
         }
     }
 }

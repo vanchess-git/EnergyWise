@@ -1,5 +1,6 @@
 package com.example.energywizeapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    SignUpScreen()
+                    MainNavigator()
                 }
             }
         }
