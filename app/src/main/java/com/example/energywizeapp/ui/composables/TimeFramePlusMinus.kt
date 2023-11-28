@@ -32,6 +32,7 @@ fun TimeFramePlusMinus(
     increment: () -> Unit = {  },
     time: Long = 0L,
     calendar: Calendar = Calendar.getInstance(),
+    isLoading: Boolean = false
 ) {
     when (timeFrameType) {
         "day" -> { SelectedDay(
@@ -85,6 +86,7 @@ private fun SelectedDay(
     increment: () -> Unit = {  },
     time: Long = 0L,
     calendar: Calendar = Calendar.getInstance(),
+    isLoading: Boolean = false
 ) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     Surface(
@@ -102,6 +104,7 @@ private fun SelectedDay(
                 onClick = decrement,
                 modifier = Modifier
                     .weight(1f),
+                enabled = !isLoading // Disable if loading
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
@@ -120,6 +123,7 @@ private fun SelectedDay(
                 onClick = increment,
                 modifier = Modifier
                     .weight(1f),
+                enabled = !isLoading // Disable if loading
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,

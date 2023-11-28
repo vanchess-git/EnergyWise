@@ -2,13 +2,31 @@ package com.example.energywizeapp.ui.composables
 
 import android.graphics.Typeface
 import android.util.Log
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,22 +37,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.energywizeapp.R
 import com.example.energywizeapp.data.api.EntsoResponse
 import com.example.energywizeapp.util.calculateTimeSpanInDays
+import com.example.energywizeapp.util.getPositionTimeFrame
 import com.example.energywizeapp.util.isDateToday
+import com.example.energywizeapp.util.rememberMarker
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
+import com.patrykandpatrick.vico.compose.component.marker.markerComponent
 import com.patrykandpatrick.vico.compose.component.shape.shader.fromBrush
 import com.patrykandpatrick.vico.compose.component.textComponent
 import com.patrykandpatrick.vico.compose.dimensions.dimensionsOf
@@ -47,6 +71,8 @@ import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
+import java.lang.Double.max
+import java.lang.Double.min
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -54,7 +80,7 @@ import java.util.Calendar
 import java.util.Locale
 
 @Composable
-fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
+fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNavIndex: Int = 1) {
     val axisTitleHorizontalPaddingValue = 8.dp
     val axisTitleVerticalPaddingValue = 2.dp
     val axisTitlePadding =
@@ -72,7 +98,21 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
     val currentHourPriceTextState = remember { mutableStateOf("Hetki...") }
     val currentHourPriceCardText by currentHourPriceTextState
 
+    val highestPriceTodayTextState = remember { mutableStateOf("Hetki...") }
+    val highestPriceTodayCardText by highestPriceTodayTextState
+    val highestPriceTodayTimeTextState = remember { mutableStateOf("") }
+    val highestPriceTodayTimeCardText by highestPriceTodayTimeTextState
+
+    val lowestPriceTodayTextState = remember { mutableStateOf("Hetki...") }
+    val lowestPriceTodayCardText by lowestPriceTodayTextState
+    val lowestPriceTodayTimeTextState = remember { mutableStateOf("") }
+    val lowestPriceTodayTimeCardText by lowestPriceTodayTimeTextState
+
+    val averagePriceTodayTextState = remember { mutableStateOf("Hetki...") }
+    val averagePriceTodayCardText by averagePriceTodayTextState
+
     LaunchedEffect(priceData) {
+
         datasetForModel.clear()
         datasetLineSpec.clear()
 
@@ -93,6 +133,11 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         var currentHourPrice: Double? = null
+        var highestToday: Double? = null
+        var lowestToday: Double? = null
+        var averageToday: Double? = null
+        var lowestPriceTime: String? = null
+        var highestPriceTime: String? = null
 
         val timeSpanInDays = calculateTimeSpanInDays(priceData)
         var timeSpan = "day"
@@ -108,9 +153,17 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
             "day" -> {
                 Log.d("LaunchedEffect Data", timeSpan)
                 for (timeSeries in priceData.publicationMarketDocument.timeSeriesList ?: emptyList()) {
+
+                    var lowestPrice: Double = Double.MAX_VALUE
+                    var highestPrice: Double = Double.MIN_VALUE
+                    var totalPrices: Double = 0.0
+                    var dataPointCount: Int = 0
+
                     val timeInterval = timeSeries.period?.timeInterval
                     val startDateTime = timeInterval?.end
+
                     var xPos = 0f
+
                     for (point in timeSeries.period?.points ?: emptyList()) {
                         val position = point.position
                         val priceAmountBeforeVAT = (point.priceAmount * 0.1)
@@ -120,6 +173,20 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                             .toDouble()
 
                         if(isDateToday(startDateTime) && selectedTimeFrame == "day") {
+                            // Update lowest and highest prices
+                            if (priceAmount < lowestPrice) {
+                                lowestPrice = priceAmount
+                                lowestPriceTime = getPositionTimeFrame(position)
+                            }
+
+                            if (priceAmount > highestPrice) {
+                                highestPrice = priceAmount
+                                highestPriceTime = getPositionTimeFrame(position)
+                            }
+
+                            totalPrices += priceAmount
+                            dataPointCount++
+
                             if (position == currentHour) {
                                 currentHourPrice = priceAmount
                             }
@@ -129,6 +196,20 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                             FloatEntry(x = xPos, y = priceAmount.toFloat())
                         )
                         xPos += 1f
+                    }
+
+                    if(isDateToday(startDateTime) && selectedTimeFrame == "day") {
+                        val averagePrice = if (dataPointCount > 0) totalPrices / dataPointCount else 0.0
+                        val formattedAverage = BigDecimal(averagePrice)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .toDouble()
+                        highestToday = highestPrice
+                        lowestToday = lowestPrice
+                        averageToday = formattedAverage
+
+                        Log.d("Price Analysis", "Lowest Price: $lowestPrice at $lowestPriceTime")
+                        Log.d("Price Analysis", "Highest Price: $highestPrice at $highestPriceTime")
+                        Log.d("Price Analysis", "Average Price: $averagePrice")
                     }
                 }
             }
@@ -268,59 +349,213 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
         }
 
         if (currentHourPrice != null) {
-            currentHourPriceTextState.value = "$currentHourPrice snt/kWh"
+            currentHourPriceTextState.value = "$currentHourPrice"
         }
+
+        if(highestToday != null) {
+            highestPriceTodayTextState.value = "$highestToday"
+            highestPriceTodayTimeTextState.value = "$highestPriceTime"
+        }
+
+        if(lowestToday != null) {
+            lowestPriceTodayTextState.value = "$lowestToday"
+            lowestPriceTodayTimeTextState.value = "$lowestPriceTime"
+
+        }
+
+        if(averageToday != null) {
+            averagePriceTodayTextState.value = "$averageToday"
+        }
+
         datasetForModel.add(dataPoints)
         modelProducer.setEntries(datasetForModel)
     }
 
-    Column {
-        ElevatedCard(
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 12.dp
-            ),
+    Column() {
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 15.dp)
+                .padding(8.dp)
+                .border(1.dp, Color.Gray.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                .shadow(2.dp, shape = RoundedCornerShape(8.dp)),
+            color = Color(0xffffffff),
+            shape = RoundedCornerShape(size = 8.dp)
         ) {
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Sähkön hinta nyt",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    fontSize = 16.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                        .padding(8.dp),
                 )
                 Text(
                     text = currentHourPriceCardText,
-                    color = Color.White,
-                    fontSize = 24.sp,
+                    color = Color.Blue,
+                    fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
+                Divider(
+                    modifier = Modifier
+                        .width(150.dp)
+                        .shadow(2.dp, shape = RoundedCornerShape(8.dp)),
+                    color = Color.Gray.copy(alpha = 0.5f),
+                    thickness = 1.dp
+                )
+                Text(
+                    text = "c/kWh",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                )
             }
         }
-        ElevatedCard(
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 6.dp
-            ),
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .border(1.dp, Color.Gray.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                .shadow(2.dp, shape = RoundedCornerShape(8.dp)),
+            color = Color(0xffffffff),
+            shape = RoundedCornerShape(size = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically,) {
+                            Icon(
+                                painter = painterResource(R.drawable.trending_up),
+                                contentDescription = null,
+                                tint = Color(0xFF800000),
+                            )
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Korkein\n$highestPriceTodayTimeCardText",
+                                    textAlign = TextAlign.Center
+                                )
+
+                                Text(
+                                    text = highestPriceTodayCardText,
+                                    color = Color(0xFF800000),
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "c/kWh",
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically,) {
+                            Icon(
+                                painter = painterResource(R.drawable.trending_down),
+                                contentDescription = null,
+                                tint = Color(0xFF008000),
+                            )
+                            Column(modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Alhaisin\n$lowestPriceTodayTimeCardText",
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = lowestPriceTodayCardText,
+                                    color = Color(0xFF008000),
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "c/kWh",
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically,) {
+                            Icon(
+                                painter = painterResource(R.drawable.trending_flat),
+                                contentDescription = null,
+                                tint = Color(0xFF000080)
+                            )
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Keskihinta",
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = averagePriceTodayCardText,
+                                    color = Color(0xFF000080),
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = "c/kWh",
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Max)
+                .padding(8.dp)
+                .border(1.dp, Color.Gray.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
+                .shadow(2.dp, shape = RoundedCornerShape(8.dp)),
+            color = Color(0xffffffff),
+            shape = RoundedCornerShape(size = 8.dp)
         ) {
             if (datasetForModel.isNotEmpty()) {
                 ProvideChartStyle {
+                    val marker = rememberMarker()
                     Chart(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier.padding(8.dp),
                         chart = lineChart(
                             lines = datasetLineSpec
                         ),
@@ -334,7 +569,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                                 maxItemCount = 6
                             ),
                             titleComponent = textComponent(
-                                color = Color.White,
+                                color = Color.Black,
                                 padding = axisTitlePadding,
                                 margins = startAxisTitleMargins,
                                 typeface = Typeface.MONOSPACE,
@@ -344,12 +579,13 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String) {
                             tickLength = 0.dp,
                             guideline = null,
                             titleComponent = textComponent(
-                                color = Color.White,
+                                color = Color.Black,
                                 padding = axisTitlePadding,
                                 margins = bottomAxisTitleMargins,
                                 typeface = Typeface.MONOSPACE,
                                 ),
                             ),
+                        marker = marker
                     )
                 }
             }
