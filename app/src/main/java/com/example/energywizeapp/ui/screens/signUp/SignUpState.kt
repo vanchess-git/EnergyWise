@@ -1,4 +1,4 @@
-package com.example.energywizeapp.ui.screens.testView.signUp
+package com.example.energywizeapp.ui.screens.signUp
 
 
 data class SignUpState(

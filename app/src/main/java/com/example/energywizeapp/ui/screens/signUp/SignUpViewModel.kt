@@ -1,9 +1,9 @@
-package com.example.energywizeapp.ui.screens.testView.signUp
+package com.example.energywizeapp.ui.screens.signUp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.energywizeapp.ui.authentification.AuthRepository
-import com.example.energywizeapp.ui.screens.testView.signIn.SignInState
+import com.example.energywizeapp.ui.screens.signIn.SignInState
 import com.example.firebaseauthyt.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

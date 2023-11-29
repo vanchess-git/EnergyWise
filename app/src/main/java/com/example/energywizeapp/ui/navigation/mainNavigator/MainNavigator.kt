@@ -31,11 +31,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.energywizeapp.ProfileDetails
 import com.example.energywizeapp.ui.authentification.AppModule
+import com.example.energywizeapp.ui.screens.profileView.ProfileDetails
 import com.example.energywizeapp.ui.screens.testView.TestView
-import com.example.energywizeapp.ui.screens.testView.signIn.SignInScreen
-import com.example.energywizeapp.ui.screens.testView.signUp.SignUpScreen
+import com.example.energywizeapp.ui.screens.signIn.SignInScreen
+import com.example.energywizeapp.ui.screens.signUp.SignUpScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth

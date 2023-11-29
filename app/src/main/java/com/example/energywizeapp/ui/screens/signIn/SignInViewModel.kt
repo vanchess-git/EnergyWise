@@ -1,4 +1,4 @@
-package com.example.energywizeapp.ui.screens.testView.signIn
+package com.example.energywizeapp.ui.screens.signIn
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf

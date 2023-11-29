@@ -1,9 +1,11 @@
-package com.example.energywizeapp.ui.screens.testView.signUp
+package com.example.energywizeapp.ui.screens.signIn
+
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,115 +24,102 @@ import androidx.navigation.NavController
 import com.example.energywizeapp.ui.navigation.mainNavigator.Screens
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(
+fun SignInScreen(
     navController: NavController,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignInViewModel = hiltViewModel()
+
 ) {
+
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val state = viewModel.signUpState.collectAsState(initial = null)
+    val state = viewModel.signInState.collectAsState(initial = null)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(start = 30.dp, end = 30.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            modifier = Modifier.padding(bottom = 10.dp),
-            text = "Welcome to EnergyWise",
+            text = "Sign in",
         )
-        Text(
-            modifier = Modifier.padding(bottom = 10.dp),
-            text = "Create Account",
+        Spacer(
+            modifier = Modifier.height(20.dp)
         )
-        Text(
-            modifier = Modifier.padding(bottom = 10.dp),
-            text = "Sign up"
-            )
         TextField(
-            modifier = Modifier.fillMaxWidth(),
             value = email,
             onValueChange = {
                 email = it
             },
-            shape = RoundedCornerShape(8.dp),
-            singleLine = true,
-            placeholder = {
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp), singleLine = true, placeholder = {
                 Text(text = "Email")
             }
         )
-
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
-            modifier = Modifier.fillMaxWidth(),
             value = password,
             onValueChange = {
                 password = it
             },
-            shape = RoundedCornerShape(8.dp),
-            singleLine = true,
-            placeholder = {
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp), singleLine = true, placeholder = {
                 Text(text = "Password")
             }
         )
+
         Button(
             onClick = {
                 scope.launch {
-                    viewModel.registerUser(email, password)
+                    viewModel.loginUser(email, password)
                 }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp, start = 30.dp, end = 30.dp),
             shape = RoundedCornerShape(15.dp)
         ) {
-            Text(
-                text = "Sign Up",
-                color = Color.White,
-                modifier = Modifier
-                    .padding(7.dp)
-            )
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            if (state.value?.isLoading == true) {
-                CircularProgressIndicator()
-            }
+            Text(text = "Sign In", color = Color.White, modifier = Modifier.padding(7.dp))
         }
         Text(
             modifier = Modifier
                 .padding(15.dp)
                 .clickable {
-                    /*TODO: navigate to SignIn*/
-                    navController.navigate(Screens.SignInScreen.route)
+                    /*TODO: navigate to SignUp*/
+                    navController.navigate(Screens.SignUpScreen.route)
                 },
-            text = "Already have an account? Sign In",
+            text = "Don't have an account? Sign Up",
             fontWeight = FontWeight.Bold, color = Color.Black,
         )
-    }
 
-    LaunchedEffect(key1 = state.value?.isSuccess) {
-        scope.launch {
-            if (state.value?.isSuccess?.isNotEmpty() == true) {
-                val success = state.value?.isSuccess
-                Toast.makeText(context, "$success", Toast.LENGTH_LONG).show()
-                /*TODO: navigate to Home*/
-                navController.navigate(Screens.ProfileDetailsScreen.route)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            if (state.value?.isLoading == true) {
+                CircularProgressIndicator()
             }
         }
-    }
-    LaunchedEffect(key1 = state.value?.isError) {
-        scope.launch {
-            if (state.value?.isError?.isNotBlank() == true) {
-                val error = state.value?.isError
-                Toast.makeText(context, "$error", Toast.LENGTH_LONG).show()
+        LaunchedEffect(key1 = state.value?.isSuccess) {
+            scope.launch {
+                if (state.value?.isSuccess?.isNotEmpty() == true) {
+                    val success = state.value?.isSuccess
+                    Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
+                    /*TODO: navigate to Home*/
+                    navController.navigate(Screens.ProfileDetailsScreen.route)
+                }
             }
         }
+        LaunchedEffect(key1 = state.value?.isError) {
+            scope.launch {
+                if (state.value?.isError?.isNotEmpty() == true) {
+                    val error = state.value?.isError
+                    Toast.makeText(context, "${error}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
     }
 }
