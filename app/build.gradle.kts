@@ -1,3 +1,12 @@
+buildscript {
+    dependencies {
+
+    }
+    repositories {
+        google()
+    }
+}
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,7 +14,7 @@ plugins {
 
 android {
     namespace = "com.example.energywizeapp"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.energywizeapp"
@@ -63,6 +72,10 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.4.0")
 //    viewmodel
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+//    coroutine
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -70,4 +83,30 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    //vico
+    // For Jetpack Compose.
+    implementation("com.patrykandpatrick.vico:compose:1.12.0")
+
+    // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
+    implementation("com.patrykandpatrick.vico:compose-m2:1.12.0")
+
+    // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
+    implementation("com.patrykandpatrick.vico:compose-m3:1.12.0")
+
+    // Houses the core logic for charts and other elements. Included in all other modules.
+    implementation("com.patrykandpatrick.vico:core:1.12.0")
+
+    // For the view system.
+    implementation("com.patrykandpatrick.vico:views:1.12.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation ("com.squareup.retrofit2:converter-simplexml:2.9.0")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7")
 }

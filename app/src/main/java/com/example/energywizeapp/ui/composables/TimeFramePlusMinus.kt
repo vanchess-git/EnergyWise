@@ -32,6 +32,7 @@ fun TimeFramePlusMinus(
     increment: () -> Unit = {  },
     time: Long = 0L,
     calendar: Calendar = Calendar.getInstance(),
+    isLoading: Boolean = false
 ) {
     when (timeFrameType) {
         "day" -> { SelectedDay(
@@ -85,11 +86,13 @@ private fun SelectedDay(
     increment: () -> Unit = {  },
     time: Long = 0L,
     calendar: Calendar = Calendar.getInstance(),
+    isLoading: Boolean = false
 ) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -101,6 +104,7 @@ private fun SelectedDay(
                 onClick = decrement,
                 modifier = Modifier
                     .weight(1f),
+                enabled = !isLoading // Disable if loading
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowLeft,
@@ -113,13 +117,13 @@ private fun SelectedDay(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "date: ")
                 Text(text = dateFormat.format(time).toString())
             }
             IconButton(
                 onClick = increment,
                 modifier = Modifier
                     .weight(1f),
+                enabled = !isLoading // Disable if loading
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
@@ -145,6 +149,7 @@ private fun SelectedWeek(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -168,7 +173,6 @@ private fun SelectedWeek(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "week:")
                 Text(text = calendar.get(Calendar.WEEK_OF_YEAR).toString())
                 Text(text = dateFormat.format(time).toString())
             }
@@ -202,6 +206,7 @@ private fun SelectedMonth(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -256,6 +261,7 @@ private fun SelectedYear(
     Surface(
         modifier = modifier
             .fillMaxWidth(),
+        color = Color(0x00000000),
     ) {
         Row(
             modifier = Modifier
@@ -279,7 +285,6 @@ private fun SelectedYear(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Text(text = "year:")
                 Text(text = dateFormat.format(time).toString())
             }
             IconButton(

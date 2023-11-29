@@ -2,19 +2,28 @@
 
 package com.example.energywizeapp.ui.navigation.mainNavigator
 
+import android.view.Surface
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,13 +34,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.energywizeapp.ui.screens.home.HomeView
 import com.example.energywizeapp.ProfileDetails
-import com.example.energywizeapp.ui.screens.testView.TestView
+import com.example.energywizeapp.ui.screens.settingsView.SettingsView
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigator(
     modifier: Modifier = Modifier
@@ -58,8 +71,32 @@ fun MainNavigator(
         ),
         MainNavItem(
             title = "Home",
-            selectedIcon = Icons.Filled.Warning,
-            unselectedIcon = Icons.Outlined.Warning,
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Outlined.Home,
+            hasNews = false,
+            route = "home",
+        ),
+        MainNavItem(
+            title = "Settings",
+            selectedIcon = Icons.Filled.Settings,
+            unselectedIcon = Icons.Outlined.Settings,
+            hasNews = false,
+            route = "settings",
+        ),
+    )
+
+    val topNavItems = listOf(
+        MainNavItem(
+            title = "Profile",
+            selectedIcon = Icons.Filled.List,
+            unselectedIcon = Icons.Outlined.List,
+            hasNews = false,
+            route = "profile",
+        ),
+        MainNavItem(
+            title = "Home",
+            selectedIcon = Icons.Filled.List,
+            unselectedIcon = Icons.Outlined.List,
             hasNews = false,
             route = "home",
         ),
@@ -78,6 +115,11 @@ fun MainNavigator(
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(1)
     }
+
+    var selectedTopNavItem by rememberSaveable {
+        mutableStateOf(1)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,7 +129,38 @@ fun MainNavigator(
                 // if we end up going for a nav drawer, it should open up with the icon below.
                 // or we could set this icon to show the selectedItem icon or just some generic
                 // app logo.
-                navigationIcon = { }
+                navigationIcon = {},
+                actions = {
+                    if (selectedItemIndex == 1) {
+                        topNavItems.forEachIndexed { index, item ->
+                            IconButton(
+                                onClick = { selectedTopNavItem = index }
+                            ) {
+                                BadgedBox(
+                                    badge = {
+                                        if (item.badgeCount != null) {
+                                            Badge {
+                                                Text(text = item.badgeCount.toString())
+                                            }
+                                        } else if(item.hasNews) {
+                                            Badge()
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = if (index == selectedTopNavItem) {
+                                            item.selectedIcon
+                                        } else item.unselectedIcon,
+                                        contentDescription = item.title,
+                                        tint = if (index == selectedTopNavItem) {
+                                            Color(0xFF00D1FF)
+                                        } else Color(0xff000000),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             )
         },
 
@@ -98,7 +171,10 @@ fun MainNavigator(
          *       changes withing the nov route.
          * */
         bottomBar = {
-            NavigationBar() {
+            NavigationBar(
+                containerColor = Color(0xffffffff),
+
+            ) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedItemIndex == index,
@@ -109,7 +185,10 @@ fun MainNavigator(
                         label = {
                             Text(
                                 text = item.title,
-                                fontSize = 6.sp,
+                                fontSize = 10.sp,
+                                color = if (index == selectedItemIndex) {
+                                    Color(0xFF00D1FF)
+                                } else Color(0xff000000),
                             )
                         },
                         icon = {
@@ -117,7 +196,7 @@ fun MainNavigator(
                                 badge = {
                                     if (item.badgeCount != null) {
                                         Badge {
-                                            Text(text = item.badgeCount.toString())
+                                            Text(text = item.badgeCount.toString(),)
                                         }
                                     } else if(item.hasNews) {
                                         Badge()
@@ -128,7 +207,10 @@ fun MainNavigator(
                                     imageVector = if (index == selectedItemIndex) {
                                         item.selectedIcon
                                     } else item.unselectedIcon,
-                                    contentDescription = item.title
+                                    contentDescription = item.title,
+                                    tint = if (index == selectedItemIndex) {
+                                        Color(0xFF00D1FF)
+                                    } else Color(0xff000000),
                                 )
                             }
                         }
@@ -137,11 +219,18 @@ fun MainNavigator(
             }
         }
     ) {innerPadding ->
-        NavHost(navController = navController, startDestination = "home", Modifier.padding(innerPadding)) {
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            Modifier
+                .padding(innerPadding)
+                .background(color = Color(0xffF2F2F2))
+                .fillMaxSize(),
+        ) {
             composable("profile") { ProfileDetails() }
             // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
-            composable("home") { TestView() }
-            composable("settings") { /*TODO: call the proper view composable */ }
+            composable("home") { HomeView(selectedTopNavIndex = selectedTopNavItem) }
+            composable("settings") { SettingsView() }
         }
     }
 }

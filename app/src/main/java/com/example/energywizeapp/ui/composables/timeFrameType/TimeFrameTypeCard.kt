@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 
 private fun selectedColor(index: Int, selectedTimeTypeIndex: Int): Color {
     if (index == selectedTimeTypeIndex) {
-        return Color(0xff0000ff)
+        return Color(0xFF00D1FF)
     } else {
         return Color(0xffffffff)
     }
@@ -32,6 +32,15 @@ fun TimeFrameTypeCard(
     index: Int = 0,
     onClick: () -> Unit = { },
 ) {
+    val timeFrameHeader = when(timeFrameTypeItem) {
+        "day" -> "DAILY"
+        "week" -> "WEEKLY"
+        "month" -> "MONTHLY"
+        "year" -> "YEARLY"
+        else -> {
+            "DAILY"
+        }
+    }
     Column(
         modifier = Modifier.clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -47,8 +56,8 @@ fun TimeFrameTypeCard(
 
         }
         Text(
-            text = timeFrameTypeItem,
-            fontSize = 10.sp
+            text = timeFrameHeader,
+            fontSize = 12.sp
         )
     }
 }
