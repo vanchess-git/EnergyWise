@@ -44,6 +44,7 @@ import com.example.energywizeapp.ProfileDetails
 import com.example.energywizeapp.ui.screens.settingsView.SettingsView
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigator(
     modifier: Modifier = Modifier
@@ -184,7 +185,7 @@ fun MainNavigator(
                         label = {
                             Text(
                                 text = item.title,
-                                fontSize = 6.sp,
+                                fontSize = 10.sp,
                                 color = if (index == selectedItemIndex) {
                                     Color(0xFF00D1FF)
                                 } else Color(0xff000000),

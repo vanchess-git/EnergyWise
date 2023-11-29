@@ -32,6 +32,15 @@ fun TimeFrameTypeCard(
     index: Int = 0,
     onClick: () -> Unit = { },
 ) {
+    val timeFrameHeader = when(timeFrameTypeItem) {
+        "day" -> "DAILY"
+        "week" -> "WEEKLY"
+        "month" -> "MONTHLY"
+        "year" -> "YEARLY"
+        else -> {
+            "DAILY"
+        }
+    }
     Column(
         modifier = Modifier.clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -47,8 +56,8 @@ fun TimeFrameTypeCard(
 
         }
         Text(
-            text = timeFrameTypeItem,
-            fontSize = 10.sp
+            text = timeFrameHeader,
+            fontSize = 12.sp
         )
     }
 }

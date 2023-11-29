@@ -60,6 +60,7 @@ import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
 import com.patrykandpatrick.vico.compose.component.marker.markerComponent
 import com.patrykandpatrick.vico.compose.component.shape.shader.fromBrush
+import com.patrykandpatrick.vico.compose.component.shapeComponent
 import com.patrykandpatrick.vico.compose.component.textComponent
 import com.patrykandpatrick.vico.compose.dimensions.dimensionsOf
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
@@ -67,7 +68,9 @@ import com.patrykandpatrick.vico.core.DefaultAlpha
 import com.patrykandpatrick.vico.core.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
+import com.patrykandpatrick.vico.core.chart.decoration.ThresholdLine
 import com.patrykandpatrick.vico.core.chart.line.LineChart
+import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
@@ -389,7 +392,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Sähkön hinta nyt",
+                    text = "Electricity price now",
                     color = Color.Black,
                     fontSize = 16.sp,
                     textAlign = TextAlign.Center,
@@ -399,7 +402,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
                 )
                 Text(
                     text = currentHourPriceCardText,
-                    color = Color.Blue,
+                    color = Color(0xFF000080),
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
@@ -457,7 +460,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Korkein\n$highestPriceTodayTimeCardText",
+                                    text = "Highest\n$highestPriceTodayTimeCardText",
                                     textAlign = TextAlign.Center
                                 )
 
@@ -484,7 +487,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Alhaisin\n$lowestPriceTodayTimeCardText",
+                                    text = "Lowest\n$lowestPriceTodayTimeCardText",
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
@@ -522,7 +525,7 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Keskihinta",
+                                    text = "Average",
                                     textAlign = TextAlign.Center
                                 )
                                 Text(
@@ -553,11 +556,13 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
         ) {
             if (datasetForModel.isNotEmpty()) {
                 ProvideChartStyle {
+                    val thresholdLine = rememberThresholdLine()
                     val marker = rememberMarker()
                     Chart(
                         modifier = Modifier.padding(8.dp),
                         chart = lineChart(
-                            lines = datasetLineSpec
+                            lines = datasetLineSpec,
+                            decorations = remember(thresholdLine) { listOf(thresholdLine) },
                         ),
                         chartModelProducer = modelProducer,
                         isZoomEnabled = false,
@@ -591,6 +596,64 @@ fun VicoChart(priceData: EntsoResponse, selectedTimeFrame: String, selectedTopNa
             }
         }
     }
-
 }
 
+
+@Composable
+private fun rememberThresholdLine(): ThresholdLine {
+    val line = shapeComponent(color = color2)
+    val label = textComponent(
+        color = Color.Black,
+        background = shapeComponent(Shapes.pillShape, color2),
+        padding = thresholdLineLabelPadding,
+        margins = thresholdLineLabelMargins,
+        typeface = Typeface.MONOSPACE,
+    )
+    return remember(line, label) {
+        ThresholdLine(thresholdValue = THRESHOLD_LINE_VALUE, lineComponent = line, labelComponent = label)
+    }
+}
+
+
+/*
+@Composable
+private fun rememberThresholdLine2(): ThresholdLine {
+    val label = textComponent(
+        color = Color.Black,
+        background = shapeComponent(Shapes.rectShape, Color(0xffe9e5af)),
+        padding = thresholdLineLabelPadding,
+        margins = thresholdLineLabelMargins,
+        typeface = Typeface.MONOSPACE,
+    )
+    val line = shapeComponent(color = thresholdLineColor)
+    return remember(label, line) {
+        ThresholdLine(thresholdRange = thresholdLineValueRange, labelComponent = label, lineComponent = line)
+    }
+}
+*/
+
+// THRESHOLD 1
+private val thresholdLineLabelMarginValue = 4.dp
+private val thresholdLineLabelHorizontalPaddingValue = 8.dp
+private val thresholdLineLabelVerticalPaddingValue = 2.dp
+private val thresholdLineLabelPadding =
+    dimensionsOf(thresholdLineLabelHorizontalPaddingValue, thresholdLineLabelVerticalPaddingValue)
+private val thresholdLineLabelMargins = dimensionsOf(thresholdLineLabelMarginValue)
+private const val THRESHOLD_LINE_VALUE = 20f
+private val color1 = Color(0xffff5500)
+private val color2 = Color(0xffd3d826)
+
+// THRESHOLD 2
+/*
+private const val THRESHOLD_LINE_VALUE_RANGE_START = 0f
+private const val THRESHOLD_LINE_VALUE_RANGE_END = 20f
+private const val THRESHOLD_LINE_ALPHA = .36f
+private val thresholdLineValueRange = THRESHOLD_LINE_VALUE_RANGE_START..THRESHOLD_LINE_VALUE_RANGE_END
+private val thresholdLineLabelHorizontalPaddingValue = 8.dp
+private val thresholdLineLabelVerticalPaddingValue = 2.dp
+private val thresholdLineLabelMarginValue = 4.dp
+private val thresholdLineLabelPadding =
+    dimensionsOf(thresholdLineLabelHorizontalPaddingValue, thresholdLineLabelVerticalPaddingValue)
+private val thresholdLineLabelMargins = dimensionsOf(thresholdLineLabelMarginValue)
+private val thresholdLineColor = Color(0xffe9e5af).copy(THRESHOLD_LINE_ALPHA)
+*/
