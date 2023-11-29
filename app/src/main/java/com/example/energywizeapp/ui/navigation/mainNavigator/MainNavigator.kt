@@ -20,8 +20,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,15 +32,34 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ProfileDetails
+import com.example.energywizeapp.ui.authentification.AppModule
 import com.example.energywizeapp.ui.screens.testView.TestView
 import com.example.energywizeapp.ui.screens.testView.signIn.SignInScreen
 import com.example.energywizeapp.ui.screens.testView.signUp.SignUpScreen
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun MainNavigator(
+    auth: FirebaseAuth = Firebase.auth,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
+    val navControllerLogin = rememberNavController()
+
+    var user by remember { mutableStateOf<FirebaseUser?>(null) }
+
+    DisposableEffect(auth) {
+        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            user = firebaseAuth.currentUser
+        }
+        auth.addAuthStateListener(listener)
+        onDispose {
+            auth.removeAuthStateListener(listener)
+        }
+    }
 
     /** this is the list for navigation items
      *  if some route needs to be changed
@@ -83,15 +104,19 @@ fun MainNavigator(
     }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = items[selectedItemIndex].title)
-                },
-                // if we end up going for a nav drawer, it should open up with the icon below.
-                // or we could set this icon to show the selectedItem icon or just some generic
-                // app logo.
-                navigationIcon = { }
-            )
+            if (user != null) {
+                TopAppBar(
+                    title = {
+                        Text(text = items[selectedItemIndex].title)
+                    },
+                    // if we end up going for a nav drawer, it should open up with the icon below.
+                    // or we could set this icon to show the selectedItem icon or just some generic
+                    // app logo.
+                    navigationIcon = { }
+                )
+            } else {
+                /** Login TopBar if needed */
+            }
         },
 
         /**
@@ -101,63 +126,76 @@ fun MainNavigator(
          *       changes withing the nov route.
          * */
         bottomBar = {
-            NavigationBar() {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        selected = selectedItemIndex == index,
-                        onClick = {
-                            selectedItemIndex = index
-                            navController.navigate(item.route)
-                        },
-                        label = {
-                            Text(
-                                text = item.title,
-                                fontSize = 6.sp,
-                            )
-                        },
-                        icon = {
-                            BadgedBox(
-                                badge = {
-                                    if (item.badgeCount != null) {
-                                        Badge {
-                                            Text(text = item.badgeCount.toString())
-                                        }
-                                    } else if (item.hasNews) {
-                                        Badge()
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = if (index == selectedItemIndex) {
-                                        item.selectedIcon
-                                    } else item.unselectedIcon,
-                                    contentDescription = item.title
+            if (user != null) {
+                NavigationBar() {
+                    items.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selectedItemIndex == index,
+                            onClick = {
+                                selectedItemIndex = index
+                                navController.navigate(item.route)
+                            },
+                            label = {
+                                Text(
+                                    text = item.title,
+                                    fontSize = 6.sp,
                                 )
+                            },
+                            icon = {
+                                BadgedBox(
+                                    badge = {
+                                        if (item.badgeCount != null) {
+                                            Badge {
+                                                Text(text = item.badgeCount.toString())
+                                            }
+                                        } else if (item.hasNews) {
+                                            Badge()
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = if (index == selectedItemIndex) {
+                                            item.selectedIcon
+                                        } else item.unselectedIcon,
+                                        contentDescription = item.title
+                                    )
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
+            } else {
+                /** login bottom bar if needed */
             }
         }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            /*TODO: starting destination SignIn*/
-            startDestination = "signIn",
-            Modifier.padding(innerPadding)
-        ) {
-            composable("profile") { ProfileDetails() }
-            // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
-            composable("home") { TestView() }
-            composable("settings") { /*TODO: call the proper view composable */ }
-
-            composable("signIn") {
-                SignInScreen(navController)
+        if (user != null) {
+            NavHost(
+                navController = navController,
+                /*TODO: starting destination SignIn*/
+                startDestination = "home",
+                Modifier.padding(innerPadding)
+            ) {
+                composable("profile") { ProfileDetails() }
+                // Function added here only for demonstrating purpose, will be deleted later from here and will be called from ProfileView
+                composable("home") { TestView() }
+                composable("settings") { /*TODO: call the proper view composable */ }
 
             }
-            composable("signUp") {
-                SignUpScreen(navController)
+        } else {
+            NavHost(
+                navController = navControllerLogin,
+                startDestination = "signIn",
+                Modifier.padding(innerPadding)
+            ) {
+                composable("signIn") {
+                    SignInScreen(navControllerLogin)
 
+                }
+                composable("signUp") {
+                    SignUpScreen(navControllerLogin)
+
+                }
             }
         }
     }

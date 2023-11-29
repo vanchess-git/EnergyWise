@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,10 +37,14 @@ import com.example.energywizeapp.ui.navigation.mainNavigator.Screens
 import com.example.energywizeapp.ui.screens.testView.signIn.SignInScreen
 import com.example.energywizeapp.ui.screens.testView.signUp.SignUpScreen
 import com.example.energywizeapp.ui.theme.EnergyWizeAppTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val auth: FirebaseAuth = Firebase.auth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,7 +53,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigator()
+                    MainNavigator(auth = auth)
                 }
             }
         }
@@ -58,7 +63,9 @@ class MainActivity : ComponentActivity() {
 
 // I know it is messy, will be fixed later
 @Composable
-fun ProfileDetails() {
+fun ProfileDetails(
+    auth: FirebaseAuth = Firebase.auth,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,6 +132,9 @@ fun ProfileDetails() {
                     Text(text = "Omavoima super halpa")
                 }
             }
+        }
+        Button(onClick = { auth.signOut() }) {
+            Text(text = "Logout")
         }
     }
 }
