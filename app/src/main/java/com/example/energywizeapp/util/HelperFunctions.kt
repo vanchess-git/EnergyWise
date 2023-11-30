@@ -96,7 +96,7 @@ fun calculateTimeSpanInDays(priceData: EntsoResponse): Long {
 }
 
 fun getPositionTimeFrame(position: Int): String {
-    require(position in 0..23) { "Position must be between 0 and 23 (inclusive)" }
+    require(position in 0..24) { "Position must be between 0 and 24 (inclusive)" }
 
     val endHour = (position + 1) % 24
 
