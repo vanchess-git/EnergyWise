@@ -42,7 +42,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.energywizeapp.ui.screens.home.HomeView
-import com.example.energywizeapp.ProfileDetails
 import com.example.energywizeapp.ui.screens.settingsView.SettingsView
 import com.example.energywizeapp.ui.authentification.AppModule
 import com.example.energywizeapp.ui.screens.profileView.ProfileDetails
