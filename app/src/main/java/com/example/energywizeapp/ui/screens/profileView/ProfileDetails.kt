@@ -32,6 +32,9 @@ import com.google.firebase.ktx.Firebase
 fun ProfileDetails(
     auth: FirebaseAuth = Firebase.auth,
 ) {
+    val currentUser = auth.currentUser
+    val displayName = currentUser?.displayName ?: "User"
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,7 +54,7 @@ fun ProfileDetails(
                     .padding(10.dp)
                     .align(Alignment.CenterVertically),
             ) {
-                Text(text = "Hei, Jorma Sähköinen!", fontWeight = FontWeight.Bold)
+                Text(text = "Hei, $displayName!", fontWeight = FontWeight.Bold)
             }
         }
         Row(
@@ -95,7 +98,7 @@ fun ProfileDetails(
                 ) {
                     Icon(imageVector = Icons.Default.AccountBox, contentDescription = "Plan")
                     Spacer(modifier = Modifier.padding(6.dp))
-                    Text(text = "Omavoima super halpa")
+                    Text(text = "Omavoima SuperHalpa")
                 }
             }
         }

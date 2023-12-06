@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -31,6 +32,9 @@ fun SignUpScreen(
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var username by rememberSaveable { mutableStateOf("") }
+    var firstName by rememberSaveable { mutableStateOf("") }
+    var surname by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state = viewModel.signUpState.collectAsState(initial = null)
@@ -76,14 +80,60 @@ fun SignUpScreen(
             },
             shape = RoundedCornerShape(8.dp),
             singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
             placeholder = {
                 Text(text = "Password")
             }
         )
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = username,
+            onValueChange = {
+                username = it
+            },
+            shape = RoundedCornerShape(8.dp),
+            singleLine = true,
+            placeholder = {
+                Text(text = "Username")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Additional fields for first name and surname
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = firstName,
+            onValueChange = {
+                firstName = it
+            },
+            shape = RoundedCornerShape(8.dp),
+            singleLine = true,
+            placeholder = {
+                Text(text = "First Name")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = surname,
+            onValueChange = {
+                surname = it
+            },
+            shape = RoundedCornerShape(8.dp),
+            singleLine = true,
+            placeholder = {
+                Text(text = "Surname")
+            }
+        )
+
         Button(
             onClick = {
                 scope.launch {
-                    viewModel.registerUser(email, password)
+                    viewModel.registerUser(email, password, username, firstName, surname)
                 }
             },
             modifier = Modifier

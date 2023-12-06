@@ -3,6 +3,7 @@ package com.example.energywizeapp.ui.authentification
 import com.example.firebaseauthyt.util.Resource
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -20,13 +21,25 @@ class AuthRepositoryImpl @Inject constructor(
         }.catch {
             emit(Resource.Error(it.message.toString()))
         }
-
     }
 
-    override fun registerUser(email: String, password: String): Flow<Resource<AuthResult>> {
+    override fun registerUser(
+        email: String,
+        password: String,
+        username: String,
+        firstName: String,
+        surname: String
+    ): Flow<Resource<AuthResult>> {
         return flow {
             emit(Resource.Loading())
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+            // Update user information after successful registration
+            result.user?.let { firebaseUser ->
+                val userProfileChangeRequest = UserProfileChangeRequest.Builder()
+                    .setDisplayName(username)
+                    .build()
+                firebaseUser.updateProfile(userProfileChangeRequest).await()
+            }
             emit(Resource.Success(result))
         }.catch {
             emit(Resource.Error(it.message.toString()))

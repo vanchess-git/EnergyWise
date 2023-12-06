@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.energywizeapp.ui.navigation.mainNavigator.Screens
 import kotlinx.coroutines.launch
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,10 +68,14 @@ fun SignInScreen(
                 password = it
             },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp), singleLine = true, placeholder = {
+            shape = RoundedCornerShape(8.dp),
+            singleLine = true,
+            placeholder = {
                 Text(text = "Password")
-            }
+            },
+            visualTransformation = PasswordVisualTransformation()
         )
+
 
         Button(
             onClick = {
