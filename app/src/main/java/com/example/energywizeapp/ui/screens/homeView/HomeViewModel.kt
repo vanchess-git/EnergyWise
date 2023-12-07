@@ -1,4 +1,4 @@
-package com.example.energywizeapp.ui.screens.home
+package com.example.energywizeapp.ui.screens.homeView
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -6,12 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.energywizeapp.data.api.EntsoResponse
 import com.example.energywizeapp.data.api.PriceRepository
-import com.example.energywizeapp.util.calculateMonthEnd
-import com.example.energywizeapp.util.calculateMonthStart
-import com.example.energywizeapp.util.calculateWeekEnd
-import com.example.energywizeapp.util.calculateWeekStart
-import com.example.energywizeapp.util.calculateYearEnd
-import com.example.energywizeapp.util.calculateYearStart
+import com.example.energywizeapp.ui.util.calculateMonthEnd
+import com.example.energywizeapp.ui.util.calculateMonthStart
+import com.example.energywizeapp.ui.util.calculateWeekEnd
+import com.example.energywizeapp.ui.util.calculateWeekStart
+import com.example.energywizeapp.ui.util.calculateYearEnd
+import com.example.energywizeapp.ui.util.calculateYearStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

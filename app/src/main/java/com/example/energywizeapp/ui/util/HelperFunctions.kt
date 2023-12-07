@@ -1,4 +1,4 @@
-package com.example.energywizeapp.util
+package com.example.energywizeapp.ui.util
 
 import android.util.Log
 import com.example.energywizeapp.data.api.EntsoResponse

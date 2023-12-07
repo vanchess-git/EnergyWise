@@ -2,7 +2,6 @@
 
 package com.example.energywizeapp.ui.navigation.mainNavigator
 
-import android.view.Surface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,19 +10,16 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,11 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.energywizeapp.ui.screens.home.HomeView
+import com.example.energywizeapp.ui.screens.homeView.HomeView
 import com.example.energywizeapp.ui.screens.settingsView.SettingsView
-import com.example.energywizeapp.ui.authentification.AppModule
 import com.example.energywizeapp.ui.screens.profileView.ProfileDetails
-import com.example.energywizeapp.ui.screens.testView.TestView
 import com.example.energywizeapp.ui.screens.signIn.SignInScreen
 import com.example.energywizeapp.ui.screens.signUp.SignUpScreen
 import com.google.firebase.auth.FirebaseAuth

@@ -1,9 +1,8 @@
-package com.example.energywizeapp.ui.screens.home
+package com.example.energywizeapp.ui.screens.homeView
 
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
