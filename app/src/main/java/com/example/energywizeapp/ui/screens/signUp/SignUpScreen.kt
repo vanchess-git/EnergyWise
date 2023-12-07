@@ -31,13 +31,24 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     var email by rememberSaveable { mutableStateOf("") }
+    var isEmailValid by remember { mutableStateOf(true) }
     var password by rememberSaveable { mutableStateOf("") }
+    var isPasswordValid by remember { mutableStateOf(true) }
     var username by rememberSaveable { mutableStateOf("") }
+    var street by rememberSaveable { mutableStateOf("") }
     var firstName by rememberSaveable { mutableStateOf("") }
     var surname by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state = viewModel.signUpState.collectAsState(initial = null)
+
+    fun isValidEmail(email: String): Boolean {
+        val emailRegex = Regex("^\\w+([.-]?\\w+)*@\\w+([.-]?\\w+)*(\\.\\w{2,})+\$")
+        return email.matches(emailRegex)
+    }
+    fun isValidPassword(password: String): Boolean {
+        return password.length >= 8
+    }
 
     Column(
         modifier = Modifier
@@ -63,13 +74,22 @@ fun SignUpScreen(
             value = email,
             onValueChange = {
                 email = it
+                isEmailValid = isValidEmail(it)
             },
             shape = RoundedCornerShape(8.dp),
             singleLine = true,
+            isError = !isEmailValid,
             placeholder = {
                 Text(text = "Email")
             }
         )
+        if (!isEmailValid) {
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = "Invalid email address",
+                color = Color.Red
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
@@ -77,6 +97,7 @@ fun SignUpScreen(
             value = password,
             onValueChange = {
                 password = it
+                isPasswordValid = isValidPassword(it)
             },
             shape = RoundedCornerShape(8.dp),
             singleLine = true,
@@ -85,6 +106,13 @@ fun SignUpScreen(
                 Text(text = "Password")
             }
         )
+        if (!isPasswordValid) {
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = "Password should have at least 8 characters",
+                color = Color.Red
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             modifier = Modifier.fillMaxWidth(),
@@ -101,7 +129,19 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Additional fields for first name and surname
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = street,
+            onValueChange = {
+                street = it
+            },
+            singleLine = true,
+            placeholder = {
+                Text(text = "Street Address")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = firstName,
@@ -133,7 +173,7 @@ fun SignUpScreen(
         Button(
             onClick = {
                 scope.launch {
-                    viewModel.registerUser(email, password, username, firstName, surname)
+                    viewModel.registerUser(email, password, username, street, firstName, surname)
                 }
             },
             modifier = Modifier

@@ -23,10 +23,11 @@ class SignUpViewModel @Inject constructor(
         email: String,
         password: String,
         username: String,
+        street: String,
         firstName: String,
         surname: String
     ) = viewModelScope.launch {
-        repository.registerUser(email, password, username, firstName, surname).collect { result ->
+        repository.registerUser(email, password, username, street, firstName, surname).collect { result ->
             when (result) {
                 is Resource.Success -> {
                     _signUpState.send(SignInState(isSuccess = "Sign Up Success "))

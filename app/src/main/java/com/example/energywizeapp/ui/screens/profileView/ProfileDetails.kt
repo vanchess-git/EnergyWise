@@ -34,6 +34,8 @@ fun ProfileDetails(
 ) {
     val currentUser = auth.currentUser
     val displayName = currentUser?.displayName ?: "User"
+    val userEmail = currentUser?.email ?: "userEmail"
+
 
     Column(
         modifier = Modifier
@@ -90,7 +92,7 @@ fun ProfileDetails(
                 ) {
                     Icon(imageVector = Icons.Default.Email, contentDescription = "Email")
                     Spacer(modifier = Modifier.padding(6.dp))
-                    Text(text = auth.currentUser?.email ?: "#userEmail")
+                    Text(text = userEmail)
                 }
                 Spacer(modifier = Modifier.padding(4.dp))
                 Row(

@@ -27,6 +27,7 @@ class AuthRepositoryImpl @Inject constructor(
         email: String,
         password: String,
         username: String,
+        street: String,
         firstName: String,
         surname: String
     ): Flow<Resource<AuthResult>> {
