@@ -35,6 +35,7 @@ fun ProfileDetails(
     val currentUser = auth.currentUser
     val displayName = currentUser?.displayName ?: "User"
     val userEmail = currentUser?.email ?: "userEmail"
+    // val userID = currentUser?.uid ?: "unknown"
 
 
     Column(
